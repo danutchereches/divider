@@ -4,6 +4,7 @@
 #include "cocos2d.h"
 #include "Helpers.h"
 #include "Loader.h"
+#include "Ball.h"
 #include "Objects.h"
 #include "AppDelegate.h"
 
@@ -26,6 +27,10 @@ private:
 	
 	cocos2d::Layer* mGameLayer;
 	cocos2d::Layer* mUILayer;
+	
+	BallPool mBallPool;
+	cocos2d::Vector<Ball*> mBalls;
+	int mBallZOrder;
 	
 	bool mIsGameServicesAvailable;
 	

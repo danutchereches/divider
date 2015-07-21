@@ -43,6 +43,8 @@ bool GameScene::init()
 	mUILayer = cocos2d::Layer::create();
 	this->addChild(mUILayer, 200);
 	
+	mBallZOrder = 999999;
+	
 	initPools();
 	
 	// Register Touch Event
@@ -80,7 +82,7 @@ bool GameScene::init()
 
 void GameScene::initPools()
 {
-
+	mBallPool.init(100, mGameLayer);
 }
 
 void GameScene::update(float dt)
@@ -110,6 +112,13 @@ void GameScene::updateSlow(float dt)
 		//		AppDelegate::pluginGameServices->unlockAchievement(1);
 		}
 	}
+	
+	Ball* ball = mBallPool.obtainPoolItem();
+	ball->setPosition(rand()% 100, rand() % 100);
+	ball->setNumber(rand()%20);
+	ball->setVisible(true);
+	ball->setLocalZOrder(mBallZOrder--);
+	mBalls.pushBack(ball);
 }
 
 bool GameScene::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event)
