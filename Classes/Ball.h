@@ -9,6 +9,7 @@ public:
 	
 	virtual bool init() override;
 	
+	inline int getNumber() { return mNumber; };
 	void setNumber(int nr);
 	
 	CREATE_FUNC(Ball);

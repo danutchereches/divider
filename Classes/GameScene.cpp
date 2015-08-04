@@ -68,7 +68,7 @@ bool GameScene::init()
 	dispatcher->addEventListenerWithSceneGraphPriority(listener4, this);
 	
 	this->schedule(schedule_selector(GameScene::update), 0.02f);
-	this->schedule(schedule_selector(GameScene::updateSlow), 0.5f);
+	this->schedule(schedule_selector(GameScene::updateSlow), 1.0f);
 	
 	if (AppDelegate::pluginAnalytics != nullptr)
 	{
@@ -114,8 +114,9 @@ void GameScene::updateSlow(float dt)
 	}
 	
 	Ball* ball = mBallPool.obtainPoolItem();
+	ball->setScale(0.2f);
 	ball->setAnchorPoint(cocos2d::Vec2::ZERO);
-	ball->setPosition(rand() % (int) (mScreenSize.width - ball->getContentSize().width), rand() % (int) (mScreenSize.height - ball->getContentSize().height));
+	ball->setPosition(rand() % (int) (mScreenSize.width - ball->getContentSize().width * ball->getScale()), rand() % (int) (mScreenSize.height - ball->getContentSize().height * ball->getScale()));
 	ball->setNumber(rand()%20);
 	ball->setColor(cocos2d::Color3B(55+rand() % 200, 55+rand() % 200, 55+rand() % 200));
 	ball->setVisible(true);
@@ -127,6 +128,23 @@ void GameScene::updateSlow(float dt)
 bool GameScene::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event)
 {
 	cocos2d::log("You touched id %d - %f, %f", touch->getID(), touch->getLocation().x, touch->getLocation().y);
+	
+	if (!mBalls.empty())
+	{
+		for (auto it = mBalls.begin(); it != mBalls.end(); it++)
+		{
+			Ball* ball = *it;
+			cocos2d::Vec2 local = touch->getLocation();
+			cocos2d::Rect r = ball->getBoundingBox();
+			
+			if (r.containsPoint(local))
+			{
+				mBallPool.recyclePoolItem(ball);
+				mBalls.eraseObject(ball);
+				break;
+			}
+		}
+	}
 	
 	return true;
 }

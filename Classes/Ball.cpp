@@ -45,6 +45,9 @@ void BallPool::onRecycleItem(Ball* item)
 {
 	item->setScale(1);
 	item->stopAllActions();
+	item->setVisible(false);
+	item->pause();
+	item->setPosition(-50, -50);
 }
 
 BallAction* BallAction::create()
@@ -66,15 +69,17 @@ void BallAction::startWithTarget(cocos2d::Node *target)
 {
 	cocos2d::Action::startWithTarget(target);
 	
+	cocos2d::Size size = target->getBoundingBox().size;
+	
 	if (_target->getAnchorPoint() != cocos2d::Vec2::ZERO)
 	{
-		_target->setPosition(_target->getPosition() - cocos2d::Vec2(_target->getContentSize().width/2, _target->getContentSize().height/2));
+		_target->setPosition(_target->getPosition() - cocos2d::Vec2(size.width/2, size.height/2));
 		_target->setAnchorPoint(cocos2d::Vec2::ZERO);
 	}
 	
 	mMaxSize = cocos2d::Director::getInstance()->getWinSize();//TODO: maybe use visible size
-	mPOffset = cocos2d::Vec2(_target->getPositionX() / (mMaxSize.width - _target->getContentSize().width),
-			_target->getPositionY() / (mMaxSize.height - _target->getContentSize().height));
+	mPOffset = cocos2d::Vec2(_target->getPositionX() / (mMaxSize.width - size.width),
+			_target->getPositionY() / (mMaxSize.height - size.height));
 	mIsDone = false;
 }
 
@@ -87,7 +92,7 @@ void BallAction::step(float dt)
 {
 	if (_target)
 	{
-		_target->setScale(_target->getScale() + dt / 5);
+		_target->setScale(_target->getScale() + dt / 15);
 		
 		cocos2d::Size size = _target->getBoundingBox().size;
 		
