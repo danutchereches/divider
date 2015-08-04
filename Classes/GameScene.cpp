@@ -114,10 +114,13 @@ void GameScene::updateSlow(float dt)
 	}
 	
 	Ball* ball = mBallPool.obtainPoolItem();
-	ball->setPosition(rand()% 100, rand() % 100);
+	ball->setAnchorPoint(cocos2d::Vec2::ZERO);
+	ball->setPosition(rand() % (int) (mScreenSize.width - ball->getContentSize().width), rand() % (int) (mScreenSize.height - ball->getContentSize().height));
 	ball->setNumber(rand()%20);
+	ball->setColor(cocos2d::Color3B(55+rand() % 200, 55+rand() % 200, 55+rand() % 200));
 	ball->setVisible(true);
 	ball->setLocalZOrder(mBallZOrder--);
+	ball->runAction(BallAction::create());
 	mBalls.pushBack(ball);
 }
 

@@ -46,3 +46,64 @@ void BallPool::onRecycleItem(Ball* item)
 	item->setScale(1);
 	item->stopAllActions();
 }
+
+BallAction* BallAction::create()
+{
+	BallAction *ret = new (std::nothrow) BallAction();
+	
+	if (ret)
+		ret->autorelease();
+	
+	return ret;
+}
+
+BallAction* BallAction::clone() const
+{
+	return BallAction::create();
+}
+
+void BallAction::startWithTarget(cocos2d::Node *target)
+{
+	cocos2d::Action::startWithTarget(target);
+	
+	if (_target->getAnchorPoint() != cocos2d::Vec2::ZERO)
+	{
+		_target->setPosition(_target->getPosition() - cocos2d::Vec2(_target->getContentSize().width/2, _target->getContentSize().height/2));
+		_target->setAnchorPoint(cocos2d::Vec2::ZERO);
+	}
+	
+	mMaxSize = cocos2d::Director::getInstance()->getWinSize();//TODO: maybe use visible size
+	mPOffset = cocos2d::Vec2(_target->getPositionX() / (mMaxSize.width - _target->getContentSize().width),
+			_target->getPositionY() / (mMaxSize.height - _target->getContentSize().height));
+	mIsDone = false;
+}
+
+BallAction* BallAction::reverse() const
+{
+	return BallAction::create();
+}
+
+void BallAction::step(float dt)
+{
+	if (_target)
+	{
+		_target->setScale(_target->getScale() + dt / 5);
+		
+		cocos2d::Size size = _target->getBoundingBox().size;
+		
+		if (size.width < mMaxSize.width)
+			_target->setPositionX((mMaxSize.width - size.width) * mPOffset.x);
+		else
+			mIsDone = true;
+		
+		if (size.height < mMaxSize.height)
+			_target->setPositionY((mMaxSize.height - size.height) * mPOffset.y);
+		else
+			mIsDone = true;
+	}
+}
+
+bool BallAction::isDone() const
+{
+	return mIsDone;
+}
