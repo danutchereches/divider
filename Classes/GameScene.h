@@ -19,6 +19,9 @@ public:
 	
 	// implement the "static create()" method manually
 	CREATE_FUNC(GameScene);
+	
+	static int NUMBER_POOL_SIZE;
+	static int NUMBER_POOL[];
 
 private:
 	cocos2d::Size mScreenSize;

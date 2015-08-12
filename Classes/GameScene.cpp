@@ -1,5 +1,8 @@
 #include "GameScene.h"
 
+int GameScene::NUMBER_POOL_SIZE = 15;
+int GameScene::NUMBER_POOL[] = {10, 12, 14, 15, 18, 20, 21, 25, 27, 28, 32, 35, 36, 42, 45};
+
 cocos2d::Scene* GameScene::createScene()
 {
 	// 'scene' is an autorelease object
@@ -117,7 +120,7 @@ void GameScene::updateSlow(float dt)
 	ball->setScale(0.2f);
 	ball->setAnchorPoint(cocos2d::Vec2::ZERO);
 	ball->setPosition(rand() % (int) (mScreenSize.width - ball->getContentSize().width * ball->getScale()), rand() % (int) (mScreenSize.height - ball->getContentSize().height * ball->getScale()));
-	ball->setNumber(rand()%20);
+	ball->setNumber(NUMBER_POOL[rand() % NUMBER_POOL_SIZE]);
 	ball->setColor(cocos2d::Color3B(55+rand() % 200, 55+rand() % 200, 55+rand() % 200));
 	ball->setVisible(true);
 	ball->setLocalZOrder(mBallZOrder--);
