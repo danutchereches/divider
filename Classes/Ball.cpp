@@ -77,7 +77,10 @@ void BallAction::startWithTarget(cocos2d::Node *target)
 		_target->setAnchorPoint(cocos2d::Vec2::ZERO);
 	}
 	
-	mMaxSize = cocos2d::Director::getInstance()->getWinSize();//TODO: maybe use visible size
+	if (_target->getParent())
+		mMaxSize = _target->getParent()->getContentSize();
+	else
+		mMaxSize = cocos2d::Director::getInstance()->getWinSize();//TODO: maybe use visible size
 	mPOffset = cocos2d::Vec2(_target->getPositionX() / (mMaxSize.width - size.width),
 			_target->getPositionY() / (mMaxSize.height - size.height));
 	mIsDone = false;

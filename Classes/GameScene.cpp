@@ -41,10 +41,21 @@ bool GameScene::init()
 	cocos2d::log("offset %f, %f", mOrigin.x, mOrigin.y);
 	
 	mGameLayer = cocos2d::Layer::create();
+	mGameLayer->ignoreAnchorPointForPosition(false);
+	mGameLayer->setPosition(cocos2d::Vec2(0, 20));
+	mGameLayer->setAnchorPoint(cocos2d::Vec2::ZERO);
+	mGameLayer->setContentSize(cocos2d::Size(mScreenSize.width, mScreenSize.height - 20));
 	this->addChild(mGameLayer, 100);
 	
 	mUILayer = cocos2d::Layer::create();
 	this->addChild(mUILayer, 200);
+	
+	cocos2d::LayerColor* bottomBar = cocos2d::LayerColor::create(cocos2d::Color4B(200, 100, 100, 255));
+	bottomBar->ignoreAnchorPointForPosition(false);
+	bottomBar->setPosition(cocos2d::Vec2::ZERO);
+	bottomBar->setAnchorPoint(cocos2d::Vec2::ZERO);
+	bottomBar->setContentSize(cocos2d::Size(mScreenSize.width, 20));
+	mUILayer->addChild(bottomBar);
 	
 	mBallZOrder = 999999;
 	
@@ -139,6 +150,7 @@ bool GameScene::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event)
 			Ball* ball = *it;
 			cocos2d::Vec2 local = touch->getLocation();
 			cocos2d::Rect r = ball->getBoundingBox();
+			r.origin += mGameLayer->getPosition();
 			
 			if (r.containsPoint(local))
 			{
