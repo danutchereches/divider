@@ -118,7 +118,7 @@ bool GameScene::init()
 	dispatcher->addEventListenerWithSceneGraphPriority(listener4, this);
 	
 	this->schedule(schedule_selector(GameScene::update), 0.02f);
-	this->schedule(schedule_selector(GameScene::updateSlow), 1.0f);
+	this->schedule(schedule_selector(GameScene::updateSlow), 1.5f);
 	
 	if (AppDelegate::pluginAnalytics != nullptr)
 	{

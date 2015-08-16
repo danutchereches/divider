@@ -95,7 +95,7 @@ void BallAction::step(float dt)
 {
 	if (_target)
 	{
-		_target->setScale(_target->getScale() + dt / 15);
+		_target->setScale(_target->getScale() + dt / 20);
 		
 		cocos2d::Size size = _target->getBoundingBox().size;
 		
