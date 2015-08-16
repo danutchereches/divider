@@ -12,7 +12,7 @@ void Loader::loadEverything()
 
 void Loader::loadSounds()
 {
-//	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("");
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("die.wav");
 //	CocosDenshion::SimpleAudioEngine::getInstance()->preloadBackgroundMusic("mfx/");
 }
 

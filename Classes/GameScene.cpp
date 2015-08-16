@@ -3,7 +3,7 @@
 int GameScene::NUMBER_POOL_SIZE = 15;
 int GameScene::NUMBER_POOL[] = {10, 12, 14, 15, 18, 20, 21, 25, 27, 28, 32, 35, 36, 42, 45};
 int GameScene::DIVISORS_SIZE = 7;
-int GameScene::DIVISORS[] = {2, 3, 4, 5, 6, 7, 9};
+int GameScene::DIVISORS[] = {3, 4, 5, 6, 7, 8, 9};
 
 cocos2d::Scene* GameScene::createScene()
 {
@@ -54,10 +54,38 @@ bool GameScene::init()
 	
 	cocos2d::LayerColor* bottomBar = cocos2d::LayerColor::create(cocos2d::Color4B(200, 100, 100, 255));
 	bottomBar->ignoreAnchorPointForPosition(false);
-	bottomBar->setPosition(cocos2d::Vec2::ZERO);
+	bottomBar->setPosition(mOrigin.x, mOrigin.y);
 	bottomBar->setAnchorPoint(cocos2d::Vec2::ZERO);
-	bottomBar->setContentSize(cocos2d::Size(mScreenSize.width, 20));
+	bottomBar->setContentSize(cocos2d::Size(mVisibleSize.width, 20));
 	mUILayer->addChild(bottomBar);
+	
+	cocos2d::Menu* bottomMenu = cocos2d::Menu::create();
+	bottomMenu->ignoreAnchorPointForPosition(false);
+	bottomMenu->setPosition(cocos2d::Vec2::ZERO);
+	bottomMenu->setAnchorPoint(cocos2d::Vec2::ZERO);
+	bottomMenu->setContentSize(bottomBar->getContentSize());
+	bottomBar->addChild(bottomMenu);
+	
+	float dw = bottomBar->getContentSize().width / DIVISORS_SIZE;
+	for (int i = 0; i < DIVISORS_SIZE; i++)
+	{
+		cocos2d::MenuItemLabel* divisor = cocos2d::MenuItemLabel::create(cocos2d::Label::createWithTTF(cocos2d::__String::createWithFormat("%d", DIVISORS[i])->_string, "fonts/default.ttf", 12),
+				[this](cocos2d::Ref* node) {
+			cocos2d::MenuItem* menuItem = dynamic_cast<cocos2d::MenuItem*>(node);
+			if (menuItem == nullptr)
+				return;
+			
+			updateDivisor(menuItem->getTag());
+		//	cocos2d::Label* divisor = dynamic_cast<cocos2d::Label*>(menuItem->getChildren().front());
+		//	if (divisor == nullptr)
+		//		return;
+		});
+		divisor->setPosition(dw/2 + i * dw, bottomBar->getContentSize().height/2);
+		divisor->setTag(DIVISORS[i]);
+		bottomMenu->addChild(divisor);
+	}
+	
+	updateDivisor(6);
 	
 	mBallZOrder = 999999;
 	
@@ -173,6 +201,35 @@ void GameScene::updateSlow(float dt)
 	mBalls.pushBack(ball);
 }
 
+void GameScene::updateDivisor(int d)
+{
+	mSelectedDivisor = d;
+	
+	cocos2d::Node* menu = mUILayer->getChildren().front()->getChildren().front();//UberHack!
+	cocos2d::Vector<cocos2d::Node*> items = menu->getChildren();
+	if (items.size() != DIVISORS_SIZE)
+	{
+		cocos2d::log("ERROR: wrong number of items in divisors menu. (%d vs %d required)", (int) items.size(), DIVISORS_SIZE);
+		AppDelegate::closeApp();
+		return;
+	}
+	
+	for (auto it = items.begin(); it != items.end(); it++)
+	{
+		cocos2d::Label* divisor = dynamic_cast<cocos2d::Label*>((*it)->getChildren().front());
+		if (mSelectedDivisor == (*it)->getTag())
+		{
+			divisor->setScale(1.0f);
+			divisor->setColor(cocos2d::Color3B::WHITE);
+		}
+		else
+		{
+			divisor->setScale(0.7f);
+			divisor->setColor(cocos2d::Color3B::GRAY);
+		}
+	}
+}
+
 bool GameScene::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event)
 {
 	cocos2d::log("You touched id %d - %f, %f", touch->getID(), touch->getLocation().x, touch->getLocation().y);
@@ -188,8 +245,17 @@ bool GameScene::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event)
 			
 			if (r.containsPoint(local))
 			{
-				mBallPool.recyclePoolItem(ball);
-				mBalls.eraseObject(ball);
+				if (ball->getNumber() % mSelectedDivisor == 0)
+				{
+					mBallPool.recyclePoolItem(ball);
+					mBalls.eraseObject(ball);
+				}
+				else
+				{
+					CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("die.wav");
+					ball->setScale(ball->getScale() + 0.1f);
+				}
+				
 				break;
 			}
 		}

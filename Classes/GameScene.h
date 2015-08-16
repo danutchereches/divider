@@ -36,6 +36,7 @@ private:
 	BallPool mBallPool;
 	cocos2d::Vector<Ball*> mBalls;
 	int mBallZOrder;
+	int mSelectedDivisor;
 	
 	bool mIsGameServicesAvailable;
 	
@@ -44,6 +45,8 @@ private:
 	
 	void update(float dt);
 	void updateSlow(float dt);
+	
+	void updateDivisor(int d);
 	
 	bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
 	void onTouchMoved(cocos2d::Touch* touch, cocos2d::Event* event);
