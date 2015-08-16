@@ -22,6 +22,8 @@ public:
 	
 	static int NUMBER_POOL_SIZE;
 	static int NUMBER_POOL[];
+	static int DIVISORS_SIZE;
+	static int DIVISORS[];
 
 private:
 	cocos2d::Size mScreenSize;
@@ -37,6 +39,7 @@ private:
 	
 	bool mIsGameServicesAvailable;
 	
+	void checkNumbers();
 	void initPools();
 	
 	void update(float dt);

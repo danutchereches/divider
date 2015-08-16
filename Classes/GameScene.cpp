@@ -2,6 +2,8 @@
 
 int GameScene::NUMBER_POOL_SIZE = 15;
 int GameScene::NUMBER_POOL[] = {10, 12, 14, 15, 18, 20, 21, 25, 27, 28, 32, 35, 36, 42, 45};
+int GameScene::DIVISORS_SIZE = 7;
+int GameScene::DIVISORS[] = {2, 3, 4, 5, 6, 7, 9};
 
 cocos2d::Scene* GameScene::createScene()
 {
@@ -59,6 +61,7 @@ bool GameScene::init()
 	
 	mBallZOrder = 999999;
 	
+	checkNumbers();
 	initPools();
 	
 	// Register Touch Event
@@ -92,6 +95,37 @@ bool GameScene::init()
 	}
 	
 	return true;
+}
+
+void GameScene::checkNumbers()
+{
+	cocos2d::log("Calculating number of divisors for all numbers:");
+	for (int i = 0; i < NUMBER_POOL_SIZE; i++)
+	{
+		int m = 0;
+		for (int j = 0; j < DIVISORS_SIZE; j++)
+			if (NUMBER_POOL[i] % DIVISORS[j] == 0)
+				m++;
+		
+		if (m == 0)
+		{
+			cocos2d::log("ERROR: number %d doesn't have any numbers in divisors!", NUMBER_POOL[i]);
+			AppDelegate::closeApp();
+		}
+		
+		cocos2d::log(" -- %d has %d divisors", NUMBER_POOL[i], m);
+	}
+	
+	cocos2d::log("\nCounting numbers in pool for each divisor:");
+	for (int i = 0; i < DIVISORS_SIZE; i++)
+	{
+		int m = 0;
+		for (int j = 0; j < NUMBER_POOL_SIZE; j++)
+			if (NUMBER_POOL[j] % DIVISORS[i] == 0)
+				m++;
+		
+		cocos2d::log(" -- %d can divide %d numbers from pool", DIVISORS[i], m);
+	}
 }
 
 void GameScene::initPools()
