@@ -67,20 +67,25 @@ bool GameScene::init()
 	bottomBar->addChild(bottomMenu);
 	
 	float dw = bottomBar->getContentSize().width / DIVISORS_SIZE;
+	std::function<void(cocos2d::Ref*)> callback = [this](cocos2d::Ref* node) {
+		cocos2d::MenuItem* menuItem = dynamic_cast<cocos2d::MenuItem*>(node);
+		if (menuItem == nullptr)
+			return;
+		
+		updateDivisor(menuItem->getTag());
+	//	cocos2d::Label* divisor = dynamic_cast<cocos2d::Label*>(menuItem->getChildren().front());
+	//	if (divisor == nullptr)
+	//		return;
+	};
 	for (int i = 0; i < DIVISORS_SIZE; i++)
 	{
-		cocos2d::MenuItemLabel* divisor = cocos2d::MenuItemLabel::create(cocos2d::Label::createWithTTF(cocos2d::__String::createWithFormat("%d", DIVISORS[i])->_string, "fonts/default.ttf", 12),
-				[this](cocos2d::Ref* node) {
-			cocos2d::MenuItem* menuItem = dynamic_cast<cocos2d::MenuItem*>(node);
-			if (menuItem == nullptr)
-				return;
-			
-			updateDivisor(menuItem->getTag());
-		//	cocos2d::Label* divisor = dynamic_cast<cocos2d::Label*>(menuItem->getChildren().front());
-		//	if (divisor == nullptr)
-		//		return;
-		});
-		divisor->setPosition(dw/2 + i * dw, bottomBar->getContentSize().height/2);
+		cocos2d::Label* label = cocos2d::Label::createWithTTF(cocos2d::__String::createWithFormat("%d", DIVISORS[i])->_string, "fonts/default.ttf", 12);
+		cocos2d::MenuItemLabel* divisor = cocos2d::MenuItemLabel::create(label, callback);
+		label->setPosition(cocos2d::Vec2(dw/2, bottomBar->getContentSize().height/2));
+		label->setAnchorPoint(cocos2d::Vec2::ANCHOR_MIDDLE);
+		divisor->setPosition(i * dw, 0);
+		divisor->setContentSize(cocos2d::Size(dw, bottomBar->getContentSize().height));
+		divisor->setAnchorPoint(cocos2d::Vec2::ZERO);
 		divisor->setTag(DIVISORS[i]);
 		bottomMenu->addChild(divisor);
 	}
@@ -216,16 +221,17 @@ void GameScene::updateDivisor(int d)
 	
 	for (auto it = items.begin(); it != items.end(); it++)
 	{
-		cocos2d::Label* divisor = dynamic_cast<cocos2d::Label*>((*it)->getChildren().front());
+		cocos2d::Node* item = (*it);
+		cocos2d::Label* label = dynamic_cast<cocos2d::Label*>(item->getChildren().front());
 		if (mSelectedDivisor == (*it)->getTag())
 		{
-			divisor->setScale(1.0f);
-			divisor->setColor(cocos2d::Color3B::WHITE);
+			label->setScale(1.0f);
+			label->setColor(cocos2d::Color3B::WHITE);
 		}
 		else
 		{
-			divisor->setScale(0.7f);
-			divisor->setColor(cocos2d::Color3B::GRAY);
+			label->setScale(0.7f);
+			label->setColor(cocos2d::Color3B::GRAY);
 		}
 	}
 }
