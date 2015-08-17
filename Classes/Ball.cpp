@@ -71,10 +71,12 @@ void BallAction::startWithTarget(cocos2d::Node *target)
 	
 	cocos2d::Size size = target->getBoundingBox().size;
 	
-	if (_target->getAnchorPoint() != cocos2d::Vec2::ZERO)
+	if (_target->getAnchorPoint() != cocos2d::Vec2::ANCHOR_MIDDLE)
 	{
-		_target->setPosition(_target->getPosition() - cocos2d::Vec2(size.width/2, size.height/2));
-		_target->setAnchorPoint(cocos2d::Vec2::ZERO);
+		_target->setPosition(_target->getPosition()
+				- cocos2d::Vec2(size.width * _target->getAnchorPoint().x, size.height * _target->getAnchorPoint().y)
+				+ cocos2d::Vec2(size.width/2, size.height/2));
+		_target->setAnchorPoint(cocos2d::Vec2::ANCHOR_MIDDLE);
 	}
 	
 	if (_target->getParent())
@@ -99,15 +101,21 @@ void BallAction::step(float dt)
 		
 		cocos2d::Size size = _target->getBoundingBox().size;
 		
-		if (size.width < mMaxSize.width)
-			_target->setPositionX((mMaxSize.width - size.width) * mPOffset.x);
-		else
-			mIsDone = true;
+		if (_target->getPosition().x < size.width/2)
+			_target->setPositionX(size.width/2);
+		else if (_target->getPosition().x + size.width/2 > mMaxSize.width)
+			_target->setPositionX(mMaxSize.width - size.width/2);
 		
-		if (size.height < mMaxSize.height)
-			_target->setPositionY((mMaxSize.height - size.height) * mPOffset.y);
-		else
+		if (_target->getPosition().y < size.height/2)
+			_target->setPositionY(size.height/2);
+		else if (_target->getPosition().y + size.height/2 > mMaxSize.height)
+			_target->setPositionY(mMaxSize.height - size.height/2);
+		
+		if (size.width > mMaxSize.width || size.height > mMaxSize.height)
+		{
 			mIsDone = true;
+			//TODO: run callback
+		}
 	}
 }
 
