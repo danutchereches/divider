@@ -1,7 +1,7 @@
 #include "GameScene.h"
 
-int GameScene::NUMBER_POOL_SIZE = 15;
-int GameScene::NUMBER_POOL[] = {10, 12, 14, 15, 18, 20, 21, 25, 27, 28, 32, 35, 36, 42, 45};
+int GameScene::NUMBER_POOL_SIZE = 21;
+int GameScene::NUMBER_POOL[] = {10, 12, 14, 15, 18, 20, 21, 25, 27, 28, 32, 35, 36, 42, 45, 48, 50, 54, 56, 64, 68};
 int GameScene::DIVISORS_SIZE = 7;
 int GameScene::DIVISORS[] = {3, 4, 5, 6, 7, 8, 9};
 
@@ -144,6 +144,7 @@ void GameScene::checkNumbers()
 		{
 			cocos2d::log("ERROR: number %d doesn't have any numbers in divisors!", NUMBER_POOL[i]);
 			AppDelegate::closeApp();
+			return;
 		}
 		
 		cocos2d::log(" -- %d has %d divisors", NUMBER_POOL[i], m);
