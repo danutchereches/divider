@@ -198,7 +198,7 @@ void GameScene::updateSlow(float dt)
 	Ball* ball = mBallPool.obtainPoolItem();
 	ball->setScale(0.2f);
 	ball->setAnchorPoint(cocos2d::Vec2::ZERO);
-	ball->setPosition(rand() % (int) (mScreenSize.width - ball->getContentSize().width * ball->getScale()), rand() % (int) (mScreenSize.height - ball->getContentSize().height * ball->getScale()));
+	ball->setPosition(rand() % (int) mScreenSize.width , rand() % (int) mScreenSize.height);
 	ball->setNumber(NUMBER_POOL[rand() % NUMBER_POOL_SIZE]);
 	ball->setColor(cocos2d::Color3B(55+rand() % 200, 55+rand() % 200, 55+rand() % 200));
 	ball->setVisible(true);
