@@ -245,11 +245,12 @@ bool GameScene::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event)
 		for (auto it = mBalls.begin(); it != mBalls.end(); it++)
 		{
 			Ball* ball = *it;
-			cocos2d::Vec2 local = touch->getLocation();
+			cocos2d::Vec2 local = touch->getLocation() - mGameLayer->getPosition();
 			cocos2d::Rect r = ball->getBoundingBox();
-			r.origin += mGameLayer->getPosition();
+		//	r.origin += mGameLayer->getPosition(); //for squares
 			
-			if (r.containsPoint(local))
+		//	if (r.containsPoint(local)) //for squares
+			if (local.distance(ball->getPosition()) <= r.size.width/2)
 			{
 				if (ball->getNumber() % mSelectedDivisor == 0)
 				{
