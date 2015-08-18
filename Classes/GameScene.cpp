@@ -50,19 +50,23 @@ bool GameScene::init()
 	this->addChild(mGameLayer, 100);
 	
 	mUILayer = cocos2d::Layer::create();
+	mUILayer->ignoreAnchorPointForPosition(false);
+	mUILayer->setPosition(mOrigin);
+	mUILayer->setAnchorPoint(cocos2d::Vec2::ZERO);
+	mUILayer->setContentSize(mVisibleSize);
 	this->addChild(mUILayer, 200);
 	
 	cocos2d::LayerColor* bottomBar = cocos2d::LayerColor::create(cocos2d::Color4B(200, 100, 100, 255));
 	bottomBar->ignoreAnchorPointForPosition(false);
-	bottomBar->setPosition(mOrigin.x, mOrigin.y);
+	bottomBar->setPosition(0, 0);
 	bottomBar->setAnchorPoint(cocos2d::Vec2::ZERO);
-	bottomBar->setContentSize(cocos2d::Size(mVisibleSize.width, 20));
+	bottomBar->setContentSize(cocos2d::Size(mUILayer->getContentSize().width, 20));
 	mUILayer->addChild(bottomBar);
 	
 	mScoreView = cocos2d::Label::createWithTTF("", "fonts/default.ttf", 10);
-	mScoreView->setPosition(cocos2d::Vec2(2, getContentSize().height - 2));
+	mScoreView->setPosition(cocos2d::Vec2(2, mUILayer->getContentSize().height - 2));
 	mScoreView->setAnchorPoint(cocos2d::Vec2(0, 1));
-	addChild(mScoreView);
+	mUILayer->addChild(mScoreView);
 	
 	cocos2d::Menu* bottomMenu = cocos2d::Menu::create();
 	bottomMenu->ignoreAnchorPointForPosition(false);
