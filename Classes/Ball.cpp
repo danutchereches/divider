@@ -81,13 +81,13 @@ void BallAction::startWithTarget(cocos2d::Node *target)
 				+ cocos2d::Vec2(size.width/2, size.height/2));
 		_target->setAnchorPoint(cocos2d::Vec2::ANCHOR_MIDDLE);
 	}
-	
+	_target->setScale(0.5f);
 	if (_target->getParent())
-		mMaxSize = _target->getParent()->getContentSize();
+		mParentSize = _target->getParent()->getContentSize();
 	else
-		mMaxSize = cocos2d::Director::getInstance()->getWinSize();//TODO: maybe use visible size
-	mPOffset = cocos2d::Vec2(_target->getPositionX() / (mMaxSize.width - size.width),
-			_target->getPositionY() / (mMaxSize.height - size.height));
+		mParentSize = cocos2d::Director::getInstance()->getWinSize();//TODO: maybe use visible size
+	mMaxSize = mParentSize/2.5f;
+	mMainPos = _target->getPosition();
 	mIsDone = false;
 }
 
@@ -100,24 +100,40 @@ void BallAction::step(float dt)
 {
 	if (_target)
 	{
-		_target->setScale(_target->getScale() + dt / 20);
+		_target->setScale(_target->getScale() + dt / 40);
 		
 		cocos2d::Size size = _target->getBoundingBox().size;
 		
 		if (_target->getPosition().x < size.width/2)
-			_target->setPositionX(size.width/2);
-		else if (_target->getPosition().x + size.width/2 > mMaxSize.width)
-			_target->setPositionX(mMaxSize.width - size.width/2);
+		{
+			mMainPos.x += size.width/2 - _target->getPosition().x;
+			_target->setPositionX(mMainPos.x);
+		}
+		else if (_target->getPosition().x + size.width/2 > mParentSize.width)
+		{
+			mMainPos.x -= _target->getPosition().x + size.width/2 - mParentSize.width;
+			_target->setPositionX(mMainPos.x);
+		}
 		
 		if (_target->getPosition().y < size.height/2)
-			_target->setPositionY(size.height/2);
-		else if (_target->getPosition().y + size.height/2 > mMaxSize.height)
-			_target->setPositionY(mMaxSize.height - size.height/2);
+		{
+			mMainPos.y += size.height/2 - _target->getPosition().y;
+			_target->setPositionY(mMainPos.y);
+		}
+		else if (_target->getPosition().y + size.height/2 > mParentSize.height)
+		{
+			mMainPos.y -= _target->getPosition().y + size.height/2 - mParentSize.height;
+			_target->setPositionY(mMainPos.y);
+		}
 		
 		if (size.width > mMaxSize.width || size.height > mMaxSize.height)
 		{
 			mIsDone = true;
 			mCallback();
+		}
+		else if (size.width > mMaxSize.width * 0.8f || size.height > mMaxSize.height * 0.8f)
+		{
+			_target->setPosition(mMainPos + cocos2d::Vec2(rand() % 2 - 1, rand() % 2 - 1));
 		}
 	}
 }

@@ -51,8 +51,9 @@ CC_CONSTRUCTOR_ACCESS:
 	bool initWithDuration(float duration);
 
 protected:
+	cocos2d::Size mParentSize;
 	cocos2d::Size mMaxSize;
-	cocos2d::Vec2 mPOffset;
+	cocos2d::Vec2 mMainPos;
 	bool mIsDone;
 	std::function<void()> mCallback;
 private:
