@@ -55,6 +55,8 @@ private:
 	void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
 	void onComeToForeground();
 	void onComeToBackground();
+	
+	void ballPopCallback(Ball* ball);
 };
 
 #endif // __GAMESCENE_H__

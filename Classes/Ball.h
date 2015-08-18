@@ -36,7 +36,7 @@ protected:
 class BallAction : public cocos2d::Action
 {
 public:
-	static BallAction* create();
+	static BallAction* create(const std::function<void()> &func);
 	
 	virtual BallAction* clone() const override;
 	virtual BallAction* reverse(void) const  override;
@@ -45,7 +45,7 @@ public:
 	virtual bool isDone() const override;
 	
 CC_CONSTRUCTOR_ACCESS:
-	BallAction() {}
+	BallAction() { mIsDone = false; }
 	virtual ~BallAction() {}
 	
 	bool initWithDuration(float duration);
@@ -54,6 +54,7 @@ protected:
 	cocos2d::Size mMaxSize;
 	cocos2d::Vec2 mPOffset;
 	bool mIsDone;
+	std::function<void()> mCallback;
 private:
 	CC_DISALLOW_COPY_AND_ASSIGN(BallAction);
 };

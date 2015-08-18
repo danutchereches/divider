@@ -203,7 +203,7 @@ void GameScene::updateSlow(float dt)
 	ball->setColor(cocos2d::Color3B(55+rand() % 200, 55+rand() % 200, 55+rand() % 200));
 	ball->setVisible(true);
 	ball->setLocalZOrder(mBallZOrder--);
-	ball->runAction(BallAction::create());
+	ball->runAction(BallAction::create(CC_CALLBACK_0(GameScene::ballPopCallback, this, ball)));
 	mBalls.pushBack(ball);
 }
 
@@ -319,4 +319,10 @@ void GameScene::onComeToForeground()
 void GameScene::onComeToBackground()
 {
 	
+}
+
+void GameScene::ballPopCallback(Ball* ball)
+{
+	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("die.wav");
+	cocos2d::Director::getInstance()->replaceScene(GameScene::createScene());
 }

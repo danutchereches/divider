@@ -50,19 +50,22 @@ void BallPool::onRecycleItem(Ball* item)
 	item->setPosition(-50, -50);
 }
 
-BallAction* BallAction::create()
+BallAction* BallAction::create(const std::function<void()> &func)
 {
 	BallAction *ret = new (std::nothrow) BallAction();
 	
 	if (ret)
+	{
+		ret->mCallback = func;
 		ret->autorelease();
+	}
 	
 	return ret;
 }
 
 BallAction* BallAction::clone() const
 {
-	return BallAction::create();
+	return BallAction::create(mCallback);
 }
 
 void BallAction::startWithTarget(cocos2d::Node *target)
@@ -90,7 +93,7 @@ void BallAction::startWithTarget(cocos2d::Node *target)
 
 BallAction* BallAction::reverse() const
 {
-	return BallAction::create();
+	return BallAction::create(mCallback);
 }
 
 void BallAction::step(float dt)
@@ -114,7 +117,7 @@ void BallAction::step(float dt)
 		if (size.width > mMaxSize.width || size.height > mMaxSize.height)
 		{
 			mIsDone = true;
-			//TODO: run callback
+			mCallback();
 		}
 	}
 }
