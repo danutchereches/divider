@@ -50,6 +50,14 @@ void BallPool::onRecycleItem(Ball* item)
 	item->setPosition(-50, -50);
 }
 
+const float BallAction::SCALE_FROM = 0.35f;
+const float BallAction::SCALE_TO = 1.0f;
+const float BallAction::TOTAL_TIME = 30.0f;
+const float BallAction::SHAKE_TIME = 10.0f;
+//auto calculated
+const float BallAction::SCALE_INDEX = TOTAL_TIME / (SCALE_TO - SCALE_FROM);
+const float BallAction::SHAKE_INDEX = SCALE_TO - SHAKE_TIME * (SCALE_TO - SCALE_FROM) / TOTAL_TIME;
+
 BallAction* BallAction::create(const std::function<void()> &func)
 {
 	BallAction *ret = new (std::nothrow) BallAction();
@@ -81,7 +89,7 @@ void BallAction::startWithTarget(cocos2d::Node *target)
 				+ cocos2d::Vec2(size.width/2, size.height/2));
 		_target->setAnchorPoint(cocos2d::Vec2::ANCHOR_MIDDLE);
 	}
-	_target->setScale(0.5f);
+	_target->setScale(SCALE_FROM);
 	if (_target->getParent())
 		mParentSize = _target->getParent()->getContentSize();
 	else
@@ -100,7 +108,7 @@ void BallAction::step(float dt)
 {
 	if (_target)
 	{
-		_target->setScale(_target->getScale() + dt / 40);
+		_target->setScale(_target->getScale() + dt / SCALE_INDEX);
 		
 		cocos2d::Size size = _target->getBoundingBox().size;
 		
@@ -126,12 +134,12 @@ void BallAction::step(float dt)
 			_target->setPositionY(mMainPos.y);
 		}
 		
-		if (size.width > mMaxSize.width || size.height > mMaxSize.height)
+		if (_target->getScale() >= SCALE_TO)
 		{
 			mIsDone = true;
 			mCallback();
 		}
-		else if (size.width > mMaxSize.width * 0.8f || size.height > mMaxSize.height * 0.8f)
+		else if (_target->getScale() > SHAKE_INDEX)
 		{
 			_target->setPosition(mMainPos + cocos2d::Vec2(rand() % 2 - 1, rand() % 2 - 1));
 		}

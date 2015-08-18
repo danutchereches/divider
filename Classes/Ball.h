@@ -49,6 +49,13 @@ CC_CONSTRUCTOR_ACCESS:
 	virtual ~BallAction() {}
 	
 	bool initWithDuration(float duration);
+	
+	static const float SCALE_FROM;
+	static const float SCALE_TO;
+	static const float TOTAL_TIME;
+	static const float SHAKE_TIME;
+	static const float SCALE_INDEX;
+	static const float SHAKE_INDEX;
 
 protected:
 	cocos2d::Size mParentSize;
