@@ -39,6 +39,7 @@ private:
 	int mSelectedDivisor;
 	
 	bool mIsGameServicesAvailable;
+	float mSpawnTimer;
 	
 	void checkNumbers();
 	void initPools();

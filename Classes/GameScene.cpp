@@ -93,6 +93,7 @@ bool GameScene::init()
 	updateDivisor(6);
 	
 	mBallZOrder = 999999;
+	mSpawnTimer = 0;
 	
 	checkNumbers();
 	initPools();
@@ -117,8 +118,8 @@ bool GameScene::init()
 	auto listener4 = cocos2d::EventListenerCustom::create(EVENT_COME_TO_BACKGROUND, CC_CALLBACK_0(GameScene::onComeToBackground, this));
 	dispatcher->addEventListenerWithSceneGraphPriority(listener4, this);
 	
-	this->schedule(schedule_selector(GameScene::update), 0.02f);
-	this->schedule(schedule_selector(GameScene::updateSlow), 1.5f);
+	this->schedule(schedule_selector(GameScene::update));
+	this->schedule(schedule_selector(GameScene::updateSlow), 1.0f);
 	
 	if (AppDelegate::pluginAnalytics != nullptr)
 	{
@@ -169,14 +170,22 @@ void GameScene::initPools()
 
 void GameScene::update(float dt)
 {
-//	timeFromLastMoney += dt;
+	mSpawnTimer += dt;
 	
-//	if (timeFromLastMoney >= 0.5f)
-//	{
-//		timeFromLastMoney = 0;
-//		
-//
-//	}
+	if (mSpawnTimer >= 1.8f)
+	{
+		mSpawnTimer = 0;
+		
+		Ball* ball = mBallPool.obtainPoolItem();
+		ball->setAnchorPoint(cocos2d::Vec2::ZERO);
+		ball->setPosition(rand() % (int) mScreenSize.width , rand() % (int) mScreenSize.height);
+		ball->setNumber(NUMBER_POOL[rand() % NUMBER_POOL_SIZE]);
+		ball->setColor(cocos2d::Color3B(55+rand() % 200, 55+rand() % 200, 55+rand() % 200));
+		ball->setVisible(true);
+		ball->setLocalZOrder(mBallZOrder--);
+		ball->runAction(BallAction::create(CC_CALLBACK_0(GameScene::ballPopCallback, this, ball)));
+		mBalls.pushBack(ball);
+	}
 }
 
 void GameScene::updateSlow(float dt)
@@ -194,16 +203,6 @@ void GameScene::updateSlow(float dt)
 		//		AppDelegate::pluginGameServices->unlockAchievement(1);
 		}
 	}
-	
-	Ball* ball = mBallPool.obtainPoolItem();
-	ball->setAnchorPoint(cocos2d::Vec2::ZERO);
-	ball->setPosition(rand() % (int) mScreenSize.width , rand() % (int) mScreenSize.height);
-	ball->setNumber(NUMBER_POOL[rand() % NUMBER_POOL_SIZE]);
-	ball->setColor(cocos2d::Color3B(55+rand() % 200, 55+rand() % 200, 55+rand() % 200));
-	ball->setVisible(true);
-	ball->setLocalZOrder(mBallZOrder--);
-	ball->runAction(BallAction::create(CC_CALLBACK_0(GameScene::ballPopCallback, this, ball)));
-	mBalls.pushBack(ball);
 }
 
 void GameScene::updateDivisor(int d)
