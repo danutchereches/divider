@@ -33,6 +33,8 @@ private:
 	cocos2d::Layer* mGameLayer;
 	cocos2d::Layer* mUILayer;
 	
+	cocos2d::Label* mScoreView;
+	
 	BallPool mBallPool;
 	cocos2d::Vector<Ball*> mBalls;
 	int mBallZOrder;
@@ -41,6 +43,8 @@ private:
 	bool mIsGameServicesAvailable;
 	float mSpawnTimer;
 	
+	int mScore;
+	
 	void checkNumbers();
 	void initPools();
 	
@@ -48,6 +52,7 @@ private:
 	void updateSlow(float dt);
 	
 	void updateDivisor(int d);
+	void updateScore();
 	
 	bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
 	void onTouchMoved(cocos2d::Touch* touch, cocos2d::Event* event);

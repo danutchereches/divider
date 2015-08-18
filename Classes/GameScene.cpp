@@ -59,6 +59,11 @@ bool GameScene::init()
 	bottomBar->setContentSize(cocos2d::Size(mVisibleSize.width, 20));
 	mUILayer->addChild(bottomBar);
 	
+	mScoreView = cocos2d::Label::createWithTTF("", "fonts/default.ttf", 10);
+	mScoreView->setPosition(cocos2d::Vec2(2, getContentSize().height - 2));
+	mScoreView->setAnchorPoint(cocos2d::Vec2(0, 1));
+	addChild(mScoreView);
+	
 	cocos2d::Menu* bottomMenu = cocos2d::Menu::create();
 	bottomMenu->ignoreAnchorPointForPosition(false);
 	bottomMenu->setPosition(cocos2d::Vec2::ZERO);
@@ -94,6 +99,9 @@ bool GameScene::init()
 	
 	mBallZOrder = 999999;
 	mSpawnTimer = 0;
+	
+	mScore = 0;
+	updateScore();
 	
 	checkNumbers();
 	initPools();
@@ -235,6 +243,11 @@ void GameScene::updateDivisor(int d)
 	}
 }
 
+void GameScene::updateScore()
+{
+	mScoreView->setString(cocos2d::__String::createWithFormat("%d", mScore)->_string);
+}
+
 bool GameScene::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event)
 {
 	cocos2d::log("You touched id %d - %f, %f", touch->getID(), touch->getLocation().x, touch->getLocation().y);
@@ -255,6 +268,9 @@ bool GameScene::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event)
 				{
 					mBallPool.recyclePoolItem(ball);
 					mBalls.eraseObject(ball);
+					
+					mScore++;
+					updateScore();
 				}
 				else
 				{
