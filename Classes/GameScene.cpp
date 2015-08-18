@@ -44,9 +44,9 @@ bool GameScene::init()
 	
 	mGameLayer = cocos2d::Layer::create();
 	mGameLayer->ignoreAnchorPointForPosition(false);
-	mGameLayer->setPosition(cocos2d::Vec2(0, 20));
+	mGameLayer->setPosition(cocos2d::Vec2(mOrigin.x, mOrigin.y + 20));
 	mGameLayer->setAnchorPoint(cocos2d::Vec2::ZERO);
-	mGameLayer->setContentSize(cocos2d::Size(mScreenSize.width, mScreenSize.height - 20));
+	mGameLayer->setContentSize(cocos2d::Size(mVisibleSize.width, mVisibleSize.height - 20));
 	this->addChild(mGameLayer, 100);
 	
 	mUILayer = cocos2d::Layer::create();
