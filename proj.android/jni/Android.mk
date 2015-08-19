@@ -18,6 +18,7 @@ LOCAL_SRC_FILES := main.cpp \
 					../../Classes/AppDelegate.cpp \
 					../../Classes/Loader.cpp \
 					../../Classes/LoadingScene.cpp \
+					../../Classes/MenuScene.cpp \
 					../../Classes/Ball.cpp \
 					../../Classes/Objects.cpp \
 					../../Classes/GameScene.cpp

@@ -123,6 +123,7 @@ set(GAME_SRC
   Classes/AppDelegate.cpp
   Classes/Loader.cpp
   Classes/LoadingScene.cpp
+  Classes/MenuScene.cpp
   Classes/Ball.cpp
   Classes/Objects.cpp
   Classes/GameScene.cpp
@@ -135,6 +136,7 @@ set(GAME_HEADERS
   Classes/AppDelegate.h
   Classes/Loader.h
   Classes/LoadingScene.h
+  Classes/MenuScene.h
   Classes/Objects.h
   Classes/Ball.h
   Classes/GameScene.h

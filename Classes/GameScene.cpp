@@ -317,7 +317,7 @@ void GameScene::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::
 		if (AppDelegate::pluginAnalytics != nullptr)
 			AppDelegate::pluginAnalytics->logEvent("click_back_btn");
 		
-		AppDelegate::closeApp();
+		cocos2d::Director::getInstance()->popScene();
 	}
 	else if (keyCode == cocos2d::EventKeyboard::KeyCode::KEY_VOLUME_DOWN)
 	{

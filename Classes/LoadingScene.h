@@ -2,7 +2,7 @@
 #define __LOADINGSCENE_H__
 
 #include "cocos2d.h"
-#include "GameScene.h"
+#include "MenuScene.h"
 #include "Helpers.h"
 
 class LoadingScene : public cocos2d::Scene {
