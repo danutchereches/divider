@@ -38,21 +38,21 @@ bool MenuScene::init()
 			[] (cocos2d::Ref* btn) {
 		cocos2d::Director::getInstance()->pushScene(GameMode1Scene::create());
 	});
-	mode1Btn->setPosition(cocos2d::Vec2(mScreenSize.width/2, mScreenSize.height * 0.65f));
+	mode1Btn->setPosition(cocos2d::Vec2(mVisibleSize.width/2, mVisibleSize.height * 0.65f));
 	menu->addChild(mode1Btn);
 	
 	auto mode2Btn = cocos2d::MenuItemLabel::create(cocos2d::Label::createWithTTF("mode 2", "fonts/default.ttf", 12),
 			[] (cocos2d::Ref* btn) {
 		cocos2d::Director::getInstance()->pushScene(GameMode2Scene::create());
 	});
-	mode2Btn->setPosition(cocos2d::Vec2(mScreenSize.width/2, mScreenSize.height * 0.5f));
+	mode2Btn->setPosition(cocos2d::Vec2(mVisibleSize.width/2, mVisibleSize.height * 0.5f));
 	menu->addChild(mode2Btn);
 	
 	auto exitBtn = cocos2d::MenuItemLabel::create(cocos2d::Label::createWithTTF("EXIT", "fonts/default.ttf", 12),
 			[] (cocos2d::Ref* btn) {
 		AppDelegate::closeApp();
 	});
-	exitBtn->setPosition(cocos2d::Vec2(mScreenSize.width/2, mScreenSize.height * 0.35f));
+	exitBtn->setPosition(cocos2d::Vec2(mVisibleSize.width/2, mVisibleSize.height * 0.35f));
 	menu->addChild(exitBtn);
 
 	return true;
