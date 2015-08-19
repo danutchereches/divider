@@ -36,14 +36,14 @@ bool MenuScene::init()
 	
 	auto mode1Btn = cocos2d::MenuItemLabel::create(cocos2d::Label::createWithTTF("mode 1", "fonts/default.ttf", 12),
 			[] (cocos2d::Ref* btn) {
-		cocos2d::Director::getInstance()->pushScene(GameScene::createScene());
+		cocos2d::Director::getInstance()->pushScene(GameMode1Scene::create());
 	});
 	mode1Btn->setPosition(cocos2d::Vec2(mScreenSize.width/2, mScreenSize.height * 0.65f));
 	menu->addChild(mode1Btn);
 	
 	auto mode2Btn = cocos2d::MenuItemLabel::create(cocos2d::Label::createWithTTF("mode 2", "fonts/default.ttf", 12),
 			[] (cocos2d::Ref* btn) {
-		//TODO:
+		cocos2d::Director::getInstance()->pushScene(GameMode2Scene::create());
 	});
 	mode2Btn->setPosition(cocos2d::Vec2(mScreenSize.width/2, mScreenSize.height * 0.5f));
 	menu->addChild(mode2Btn);

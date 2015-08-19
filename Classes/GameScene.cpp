@@ -5,30 +5,10 @@ int GameScene::NUMBER_POOL[] = {10, 12, 14, 15, 18, 20, 21, 25, 27, 28, 32, 35, 
 int GameScene::DIVISORS_SIZE = 7;
 int GameScene::DIVISORS[] = {3, 4, 5, 6, 7, 8, 9};
 
-cocos2d::Scene* GameScene::createScene()
-{
-	// 'scene' is an autorelease object
-	auto scene = cocos2d::Scene::create();
-	
-	// 'layer' is an autorelease object
-	auto layer = GameScene::create();
-	
-	// add layer as a child to scene
-	scene->addChild(layer);
-	
-	// return the scene
-	return scene;
-}
-
-// on "init" you need to initialize your instance
 bool GameScene::init()
 {
-	//////////////////////////////
-	// 1. super init first
-	if (!cocos2d::LayerColor::initWithColor(cocos2d::Color4B(44, 44, 44, 255)))
-	{
+	if (!cocos2d::Scene::init())
 		return false;
-	}
 	
 	cocos2d::UserDefault* ud = cocos2d::UserDefault::getInstance();
 	
@@ -56,50 +36,10 @@ bool GameScene::init()
 	mUILayer->setContentSize(mVisibleSize);
 	this->addChild(mUILayer, 200);
 	
-	cocos2d::LayerColor* bottomBar = cocos2d::LayerColor::create(cocos2d::Color4B(200, 100, 100, 255));
-	bottomBar->ignoreAnchorPointForPosition(false);
-	bottomBar->setPosition(0, 0);
-	bottomBar->setAnchorPoint(cocos2d::Vec2::ZERO);
-	bottomBar->setContentSize(cocos2d::Size(mUILayer->getContentSize().width, 20));
-	mUILayer->addChild(bottomBar);
-	
 	mScoreView = cocos2d::Label::createWithTTF("", "fonts/default.ttf", 10);
 	mScoreView->setPosition(cocos2d::Vec2(2, mUILayer->getContentSize().height - 2));
 	mScoreView->setAnchorPoint(cocos2d::Vec2(0, 1));
 	mUILayer->addChild(mScoreView);
-	
-	cocos2d::Menu* bottomMenu = cocos2d::Menu::create();
-	bottomMenu->ignoreAnchorPointForPosition(false);
-	bottomMenu->setPosition(cocos2d::Vec2::ZERO);
-	bottomMenu->setAnchorPoint(cocos2d::Vec2::ZERO);
-	bottomMenu->setContentSize(bottomBar->getContentSize());
-	bottomBar->addChild(bottomMenu);
-	
-	float dw = bottomBar->getContentSize().width / DIVISORS_SIZE;
-	std::function<void(cocos2d::Ref*)> callback = [this](cocos2d::Ref* node) {
-		cocos2d::MenuItem* menuItem = dynamic_cast<cocos2d::MenuItem*>(node);
-		if (menuItem == nullptr)
-			return;
-		
-		updateDivisor(menuItem->getTag());
-	//	cocos2d::Label* divisor = dynamic_cast<cocos2d::Label*>(menuItem->getChildren().front());
-	//	if (divisor == nullptr)
-	//		return;
-	};
-	for (int i = 0; i < DIVISORS_SIZE; i++)
-	{
-		cocos2d::Label* label = cocos2d::Label::createWithTTF(cocos2d::__String::createWithFormat("%d", DIVISORS[i])->_string, "fonts/default.ttf", 12);
-		cocos2d::MenuItemLabel* divisor = cocos2d::MenuItemLabel::create(label, callback);
-		label->setPosition(cocos2d::Vec2(dw/2, bottomBar->getContentSize().height/2));
-		label->setAnchorPoint(cocos2d::Vec2::ANCHOR_MIDDLE);
-		divisor->setPosition(i * dw, 0);
-		divisor->setContentSize(cocos2d::Size(dw, bottomBar->getContentSize().height));
-		divisor->setAnchorPoint(cocos2d::Vec2::ZERO);
-		divisor->setTag(DIVISORS[i]);
-		bottomMenu->addChild(divisor);
-	}
-	
-	updateDivisor(6);
 	
 	mBallZOrder = 999999;
 	mSpawnTimer = 0;
@@ -184,19 +124,11 @@ void GameScene::update(float dt)
 {
 	mSpawnTimer += dt;
 	
-	if (mSpawnTimer >= 1.8f)
+	if (mSpawnTimer >= mSpawnInterval)
 	{
 		mSpawnTimer = 0;
 		
-		Ball* ball = mBallPool.obtainPoolItem();
-		ball->setAnchorPoint(cocos2d::Vec2::ZERO);
-		ball->setPosition(rand() % (int) mScreenSize.width , rand() % (int) mScreenSize.height);
-		ball->setNumber(NUMBER_POOL[rand() % NUMBER_POOL_SIZE]);
-		ball->setColor(cocos2d::Color3B(55+rand() % 200, 55+rand() % 200, 55+rand() % 200));
-		ball->setVisible(true);
-		ball->setLocalZOrder(mBallZOrder--);
-		ball->runAction(BallAction::create(CC_CALLBACK_0(GameScene::ballPopCallback, this, ball)));
-		mBalls.pushBack(ball);
+		spawnBall();
 	}
 }
 
@@ -213,36 +145,6 @@ void GameScene::updateSlow(float dt)
 			
 		//	if (mScore >= 10000)
 		//		AppDelegate::pluginGameServices->unlockAchievement(1);
-		}
-	}
-}
-
-void GameScene::updateDivisor(int d)
-{
-	mSelectedDivisor = d;
-	
-	cocos2d::Node* menu = mUILayer->getChildren().front()->getChildren().front();//UberHack!
-	cocos2d::Vector<cocos2d::Node*> items = menu->getChildren();
-	if (items.size() != DIVISORS_SIZE)
-	{
-		cocos2d::log("ERROR: wrong number of items in divisors menu. (%d vs %d required)", (int) items.size(), DIVISORS_SIZE);
-		AppDelegate::closeApp();
-		return;
-	}
-	
-	for (auto it = items.begin(); it != items.end(); it++)
-	{
-		cocos2d::Node* item = (*it);
-		cocos2d::Label* label = dynamic_cast<cocos2d::Label*>(item->getChildren().front());
-		if (mSelectedDivisor == (*it)->getTag())
-		{
-			label->setScale(1.0f);
-			label->setColor(cocos2d::Color3B::WHITE);
-		}
-		else
-		{
-			label->setScale(0.7f);
-			label->setColor(cocos2d::Color3B::GRAY);
 		}
 	}
 }
@@ -268,19 +170,10 @@ bool GameScene::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event)
 		//	if (r.containsPoint(local)) //for squares
 			if (local.distance(ball->getPosition()) <= r.size.width/2)
 			{
-				if (ball->getNumber() % mSelectedDivisor == 0)
-				{
-					mBallPool.recyclePoolItem(ball);
-					mBalls.eraseObject(ball);
-					
-					mScore++;
-					updateScore();
-				}
+				if (mSelectedDivisor && ball->getNumber() % mSelectedDivisor == 0)
+					divideBall(ball);
 				else
-				{
-					CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("die.wav");
-					ball->setScale(ball->getScale() + 0.1f);
-				}
+					missBall(ball);
 				
 				break;
 			}
@@ -342,5 +235,157 @@ void GameScene::onComeToBackground()
 void GameScene::ballPopCallback(Ball* ball)
 {
 	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("die.wav");
-	cocos2d::Director::getInstance()->replaceScene(GameScene::createScene());
+	cocos2d::Director::getInstance()->replaceScene(clone());
+}
+
+bool GameMode1Scene::init()
+{
+	if (!GameScene::init())
+		return false;
+	
+	cocos2d::LayerColor* bottomBar = cocos2d::LayerColor::create(cocos2d::Color4B(200, 100, 100, 255));
+	bottomBar->ignoreAnchorPointForPosition(false);
+	bottomBar->setPosition(0, 0);
+	bottomBar->setAnchorPoint(cocos2d::Vec2::ZERO);
+	bottomBar->setContentSize(cocos2d::Size(mUILayer->getContentSize().width, 20));
+	bottomBar->setTag(301);
+	mUILayer->addChild(bottomBar);
+	
+	cocos2d::Menu* bottomMenu = cocos2d::Menu::create();
+	bottomMenu->ignoreAnchorPointForPosition(false);
+	bottomMenu->setPosition(cocos2d::Vec2::ZERO);
+	bottomMenu->setAnchorPoint(cocos2d::Vec2::ZERO);
+	bottomMenu->setContentSize(bottomBar->getContentSize());
+	bottomBar->addChild(bottomMenu);
+	
+	float dw = bottomBar->getContentSize().width / DIVISORS_SIZE;
+	std::function<void(cocos2d::Ref*)> callback = [this](cocos2d::Ref* node) {
+		cocos2d::MenuItem* menuItem = dynamic_cast<cocos2d::MenuItem*>(node);
+		if (menuItem == nullptr)
+			return;
+		
+		updateDivisor(menuItem->getTag());
+	//	cocos2d::Label* divisor = dynamic_cast<cocos2d::Label*>(menuItem->getChildren().front());
+	//	if (divisor == nullptr)
+	//		return;
+	};
+	for (int i = 0; i < DIVISORS_SIZE; i++)
+	{
+		cocos2d::Label* label = cocos2d::Label::createWithTTF(cocos2d::__String::createWithFormat("%d", DIVISORS[i])->_string, "fonts/default.ttf", 12);
+		cocos2d::MenuItemLabel* divisor = cocos2d::MenuItemLabel::create(label, callback);
+		label->setPosition(cocos2d::Vec2(dw/2, bottomBar->getContentSize().height/2));
+		label->setAnchorPoint(cocos2d::Vec2::ANCHOR_MIDDLE);
+		divisor->setPosition(i * dw, 0);
+		divisor->setContentSize(cocos2d::Size(dw, bottomBar->getContentSize().height));
+		divisor->setAnchorPoint(cocos2d::Vec2::ZERO);
+		divisor->setTag(DIVISORS[i]);
+		bottomMenu->addChild(divisor);
+	}
+	
+	mSpawnInterval = 1.8f;
+	
+	updateDivisor(6);
+	
+	return true;
+}
+
+void GameMode1Scene::updateDivisor(int d)
+{
+	mSelectedDivisor = d;
+	
+	cocos2d::Node* menu = mUILayer->getChildByTag(301)->getChildren().front();//UberHack!
+	cocos2d::Vector<cocos2d::Node*> items = menu->getChildren();
+	if (items.size() != DIVISORS_SIZE)
+	{
+		cocos2d::log("ERROR: wrong number of items in divisors menu. (%d vs %d required)", (int) items.size(), DIVISORS_SIZE);
+		AppDelegate::closeApp();
+		return;
+	}
+	
+	for (auto it = items.begin(); it != items.end(); it++)
+	{
+		cocos2d::Node* item = (*it);
+		cocos2d::Label* label = dynamic_cast<cocos2d::Label*>(item->getChildren().front());
+		if (mSelectedDivisor == (*it)->getTag())
+		{
+			label->setScale(1.0f);
+			label->setColor(cocos2d::Color3B::WHITE);
+		}
+		else
+		{
+			label->setScale(0.7f);
+			label->setColor(cocos2d::Color3B::GRAY);
+		}
+	}
+}
+
+void GameMode1Scene::spawnBall()
+{
+	Ball* ball = mBallPool.obtainPoolItem();
+	ball->setAnchorPoint(cocos2d::Vec2::ZERO);
+	ball->setPosition(rand() % (int) mScreenSize.width , rand() % (int) mScreenSize.height);
+	ball->setNumber(NUMBER_POOL[rand() % NUMBER_POOL_SIZE]);
+	ball->setColor(cocos2d::Color3B(55+rand() % 200, 55+rand() % 200, 55+rand() % 200));
+	ball->setVisible(true);
+	ball->setLocalZOrder(mBallZOrder--);
+	ball->runAction(BallAction::create(CC_CALLBACK_0(GameMode1Scene::ballPopCallback, this, ball)));
+	mBalls.pushBack(ball);
+}
+
+void GameMode1Scene::divideBall(Ball* ball)
+{
+	mBallPool.recyclePoolItem(ball);
+	mBalls.eraseObject(ball);
+	
+	mScore++;
+	updateScore();
+}
+
+void GameMode1Scene::missBall(Ball* ball)
+{
+	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("die.wav");
+	ball->setScale(ball->getScale() + 0.1f);
+}
+
+GameScene* GameMode1Scene::clone() const
+{
+	return GameMode1Scene::create();
+}
+
+bool GameMode2Scene::init()
+{
+	if (!GameScene::init())
+		return false;
+	
+	mSpawnInterval = 1.8f;
+	
+	updateDivisor(2);
+	
+	return true;
+}
+
+void GameMode2Scene::updateDivisor(int d)
+{
+	
+}
+
+void GameMode2Scene::spawnBall()
+{
+	
+}
+
+void GameMode2Scene::divideBall(Ball* ball)
+{
+	mScore++;
+	updateScore();
+}
+
+void GameMode2Scene::missBall(Ball* ball)
+{
+	
+}
+
+GameScene* GameMode2Scene::clone() const
+{
+	return GameMode2Scene::create();
 }

@@ -8,24 +8,18 @@
 #include "Objects.h"
 #include "AppDelegate.h"
 
-class GameScene : public cocos2d::LayerColor
+class GameScene : public cocos2d::Scene
 {
 public:
-	// there's no 'id' in cpp, so we recommend returning the class instance pointer
-	static cocos2d::Scene* createScene();
-	
-	// Here's a difference. Method 'init' in cocos2d-x returns bool, instead of returning 'id' in cocos2d-iphone
 	virtual bool init() override;
-	
-	// implement the "static create()" method manually
-	CREATE_FUNC(GameScene);
 	
 	static int NUMBER_POOL_SIZE;
 	static int NUMBER_POOL[];
 	static int DIVISORS_SIZE;
 	static int DIVISORS[];
-
-private:
+	
+	virtual GameScene* clone() const = 0;
+protected:
 	cocos2d::Size mScreenSize;
 	cocos2d::Size mVisibleSize;
 	cocos2d::Vec2 mOrigin;
@@ -42,6 +36,7 @@ private:
 	
 	bool mIsGameServicesAvailable;
 	float mSpawnTimer;
+	float mSpawnInterval;
 	
 	int mScore;
 	
@@ -51,8 +46,11 @@ private:
 	void update(float dt);
 	void updateSlow(float dt);
 	
-	void updateDivisor(int d);
-	void updateScore();
+	virtual void updateDivisor(int d) = 0;
+	virtual void updateScore();
+	virtual void spawnBall() = 0;
+	virtual void divideBall(Ball* ball) = 0;
+	virtual void missBall(Ball* ball) = 0;
 	
 	bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
 	void onTouchMoved(cocos2d::Touch* touch, cocos2d::Event* event);
@@ -63,6 +61,36 @@ private:
 	void onComeToBackground();
 	
 	void ballPopCallback(Ball* ball);
+};
+
+class GameMode1Scene : public GameScene
+{
+public:
+	bool init() override;
+	
+	GameScene* clone() const override;
+	
+	CREATE_FUNC(GameMode1Scene);
+protected:
+	void updateDivisor(int d) override;
+	void spawnBall() override;
+	void divideBall(Ball* ball) override;
+	void missBall(Ball* ball) override;
+};
+
+class GameMode2Scene : public GameScene
+{
+public:
+	bool init() override;
+	
+	GameScene* clone() const override;
+	
+	CREATE_FUNC(GameMode2Scene);
+protected:
+	void updateDivisor(int d) override;
+	void spawnBall() override;
+	void divideBall(Ball* ball) override;
+	void missBall(Ball* ball) override;
 };
 
 #endif // __GAMESCENE_H__
