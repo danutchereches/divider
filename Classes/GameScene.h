@@ -32,7 +32,7 @@ protected:
 	BallPool mBallPool;
 	cocos2d::Vector<Ball*> mBalls;
 	int mBallZOrder;
-	int mSelectedDivisor;
+	int mCurrentDivisor;
 	
 	bool mIsGameServicesAvailable;
 	float mSpawnTimer;
@@ -43,8 +43,8 @@ protected:
 	void checkNumbers();
 	void initPools();
 	
-	void update(float dt);
-	void updateSlow(float dt);
+	virtual void update(float dt);
+	virtual void updateSlow(float dt);
 	
 	virtual void updateDivisor(int d) = 0;
 	virtual void updateScore();
@@ -59,8 +59,6 @@ protected:
 	void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
 	void onComeToForeground();
 	void onComeToBackground();
-	
-	void ballPopCallback(Ball* ball);
 };
 
 class GameMode1Scene : public GameScene
@@ -76,6 +74,8 @@ protected:
 	void spawnBall() override;
 	void divideBall(Ball* ball) override;
 	void missBall(Ball* ball) override;
+	
+	void ballPopCallback(Ball* ball);
 };
 
 class GameMode2Scene : public GameScene
@@ -87,6 +87,9 @@ public:
 	
 	CREATE_FUNC(GameMode2Scene);
 protected:
+	void update(float dt) override;
+	void updateSlow(float dt) override;
+	
 	void updateDivisor(int d) override;
 	void spawnBall() override;
 	void divideBall(Ball* ball) override;

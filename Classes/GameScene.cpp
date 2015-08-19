@@ -170,7 +170,7 @@ bool GameScene::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event)
 		//	if (r.containsPoint(local)) //for squares
 			if (local.distance(ball->getPosition()) <= r.size.width/2)
 			{
-				if (mSelectedDivisor && ball->getNumber() % mSelectedDivisor == 0)
+				if (mCurrentDivisor && ball->getNumber() % mCurrentDivisor == 0)
 					divideBall(ball);
 				else
 					missBall(ball);
@@ -232,12 +232,6 @@ void GameScene::onComeToBackground()
 	
 }
 
-void GameScene::ballPopCallback(Ball* ball)
-{
-	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("die.wav");
-	cocos2d::Director::getInstance()->replaceScene(clone());
-}
-
 bool GameMode1Scene::init()
 {
 	if (!GameScene::init())
@@ -291,7 +285,7 @@ bool GameMode1Scene::init()
 
 void GameMode1Scene::updateDivisor(int d)
 {
-	mSelectedDivisor = d;
+	mCurrentDivisor = d;
 	
 	cocos2d::Node* menu = mUILayer->getChildByTag(301)->getChildren().front();//UberHack!
 	cocos2d::Vector<cocos2d::Node*> items = menu->getChildren();
@@ -306,7 +300,7 @@ void GameMode1Scene::updateDivisor(int d)
 	{
 		cocos2d::Node* item = (*it);
 		cocos2d::Label* label = dynamic_cast<cocos2d::Label*>(item->getChildren().front());
-		if (mSelectedDivisor == (*it)->getTag())
+		if (mCurrentDivisor == (*it)->getTag())
 		{
 			label->setScale(1.0f);
 			label->setColor(cocos2d::Color3B::WHITE);
@@ -322,7 +316,6 @@ void GameMode1Scene::updateDivisor(int d)
 void GameMode1Scene::spawnBall()
 {
 	Ball* ball = mBallPool.obtainPoolItem();
-	ball->setAnchorPoint(cocos2d::Vec2::ZERO);
 	ball->setPosition(rand() % (int) mScreenSize.width , rand() % (int) mScreenSize.height);
 	ball->setNumber(NUMBER_POOL[rand() % NUMBER_POOL_SIZE]);
 	ball->setColor(cocos2d::Color3B(55+rand() % 200, 55+rand() % 200, 55+rand() % 200));
@@ -347,6 +340,12 @@ void GameMode1Scene::missBall(Ball* ball)
 	ball->setScale(ball->getScale() + 0.1f);
 }
 
+void GameMode1Scene::ballPopCallback(Ball* ball)
+{
+	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("die.wav");
+	cocos2d::Director::getInstance()->replaceScene(clone());
+}
+
 GameScene* GameMode1Scene::clone() const
 {
 	return GameMode1Scene::create();
@@ -357,32 +356,70 @@ bool GameMode2Scene::init()
 	if (!GameScene::init())
 		return false;
 	
-	mSpawnInterval = 1.8f;
+	mSpawnInterval = 0.5f;
 	
-	updateDivisor(2);
+	updateDivisor(3);
 	
 	return true;
 }
 
+void GameMode2Scene::update(float dt)
+{
+	GameScene::update(dt);
+	
+	mGameLayer->setPositionY(mGameLayer->getPositionY() - dt * 30);
+}
+
+void GameMode2Scene::updateSlow(float dt)
+{
+	GameScene::updateSlow(dt);
+	
+	if (mBalls.size() > 0)
+	{
+		while (!mBalls.empty())
+		{
+			Ball* ball = mBalls.front();
+			if (ball->getPositionY() < -mGameLayer->getPositionY())
+			{
+				mBallPool.recyclePoolItem(ball);
+				mBalls.eraseObject(ball);
+			}
+			else
+				break;
+		}
+	}
+}
+
 void GameMode2Scene::updateDivisor(int d)
 {
-	
+	mCurrentDivisor = d;
 }
 
 void GameMode2Scene::spawnBall()
 {
-	
+	Ball* ball = mBallPool.obtainPoolItem();
+	ball->setPosition(rand() % (int) mGameLayer->getContentSize().width, -mGameLayer->getPositionY() + mScreenSize.height);
+	ball->setNumber(NUMBER_POOL[rand() % NUMBER_POOL_SIZE]);
+	ball->setColor(cocos2d::Color3B(55+rand() % 200, 55+rand() % 200, 55+rand() % 200));
+	ball->setVisible(true);
+	ball->setLocalZOrder(mBallZOrder--);
+	ball->setScale(0.5f);
+	mBalls.pushBack(ball);
 }
 
 void GameMode2Scene::divideBall(Ball* ball)
 {
+	mBallPool.recyclePoolItem(ball);
+	mBalls.eraseObject(ball);
+	
 	mScore++;
 	updateScore();
 }
 
 void GameMode2Scene::missBall(Ball* ball)
 {
-	
+	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("die.wav");
+	cocos2d::Director::getInstance()->replaceScene(clone());
 }
 
 GameScene* GameMode2Scene::clone() const
