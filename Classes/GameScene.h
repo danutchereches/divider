@@ -91,7 +91,6 @@ protected:
 	int mWaveNumber;
 	float mWaveTimer;
 	float mWaveLength;
-	float mWaveDelay;
 	
 	int mPreviousDivisor;
 	int mNextDivisor;

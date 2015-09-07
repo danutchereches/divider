@@ -379,28 +379,43 @@ bool GameMode2Scene::init()
 	
 	mSpawnInterval = 1.2f;
 	mWaveLength = 30.0f;
-	mWaveDelay = 6.0f;
 	
 	mCurrentDivisor = -1;
-	updateDivisor(DIVISORS[rand() % DIVISORS_SIZE]);
+	mNextDivisor = DIVISORS[rand() % DIVISORS_SIZE];
 	
 	return true;
 }
 
 void GameMode2Scene::update(float dt)
 {
+	if (mWaveTimer == 0) // if starting new wave, wait for all balls to go out of the screen
+	{
+		if (mBalls.size() == 0)
+		{
+			mSpawnTimer = mSpawnInterval;
+			mWaveTimer += dt;
+			
+			mNextDivisorLabel->setVisible(false);
+			updateDivisor(mNextDivisor);
+		}
+		else
+		{
+			mSpawnTimer -= mSpawnInterval;
+		}
+	}
+	else
+	{
+		mWaveTimer += dt;
+	}
+	
 	GameScene::update(dt);
 	
 	mGameLayer->setPositionY(mGameLayer->getPositionY() + dt * 30);
-	
-	mWaveTimer += dt;
 	
 	if (mWaveTimer >= mWaveLength)
 	{
 		mWaveTimer = 0;
 		mWaveNumber++;
-		
-		mSpawnTimer -= mWaveDelay;
 		
 		pick_number:
 		int d = DIVISORS[rand() % DIVISORS_SIZE];
@@ -410,11 +425,6 @@ void GameMode2Scene::update(float dt)
 		mNextDivisor = d;
 		mNextDivisorLabel->setVisible(true);
 		mNextDivisorLabel->setString(cocos2d::__String::createWithFormat("%d", d)->_string);
-		mNextDivisorLabel->runAction(cocos2d::Sequence::create(cocos2d::DelayTime::create(mWaveDelay),
-				cocos2d::CallFuncN::create([this] (cocos2d::Node* node) {
-			node->setVisible(false);
-			updateDivisor(mNextDivisor);
-		}), nullptr));
 		
 		cocos2d::log("selected divisor %d", d);
 	}
@@ -434,6 +444,9 @@ void GameMode2Scene::updateSlow(float dt)
 			{
 				mBallPool.recyclePoolItem(ball);
 				mBalls.eraseObject(ball);
+				
+				if (ball->getNumber() % mCurrentDivisor == 0)
+					missBall(ball);
 			}
 			else
 				break;
@@ -443,6 +456,9 @@ void GameMode2Scene::updateSlow(float dt)
 
 void GameMode2Scene::updateDivisor(int d)
 {
+	if (mBalls.size() > 0)
+		cocos2d::log("WARNING: Screen is not empty! Divisor shouldn't change while balls are still on screen!");
+	
 	mPreviousDivisor = mCurrentDivisor;
 	mCurrentDivisor = d;
 	
