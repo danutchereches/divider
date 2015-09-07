@@ -380,6 +380,7 @@ bool GameMode2Scene::init()
 	mSpawnInterval = 1.2f;
 	mWaveLength = 30.0f;
 	
+	mWaveNumber = 1;
 	mCurrentDivisor = -1;
 	mNextDivisor = DIVISORS[rand() % DIVISORS_SIZE];
 	
@@ -397,6 +398,12 @@ void GameMode2Scene::update(float dt)
 			
 			mNextDivisorLabel->setVisible(false);
 			updateDivisor(mNextDivisor);
+			
+			if (mWaveNumber > 1)
+			{
+				mScore += 5;
+				updateScore();
+			}
 		}
 		else
 		{
