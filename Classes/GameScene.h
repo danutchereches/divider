@@ -87,6 +87,19 @@ public:
 	
 	CREATE_FUNC(GameMode2Scene);
 protected:
+	
+	int mWaveNumber;
+	float mWaveTimer;
+	float mWaveLength;
+	float mWaveDelay;
+	
+	int mPreviousDivisor;
+	int mNextDivisor;
+	
+	cocos2d::Label* mPreviousDivisorLabel;
+	cocos2d::Label* mCurrentDivisorLabel;
+	cocos2d::Label* mNextDivisorLabel;
+	
 	void update(float dt) override;
 	void updateSlow(float dt) override;
 	

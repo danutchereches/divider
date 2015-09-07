@@ -356,9 +356,33 @@ bool GameMode2Scene::init()
 	if (!GameScene::init())
 		return false;
 	
-	mSpawnInterval = 0.5f;
+	cocos2d::LayerColor* bottomBar = cocos2d::LayerColor::create(cocos2d::Color4B(200, 100, 100, 255));
+	bottomBar->ignoreAnchorPointForPosition(false);
+	bottomBar->setPosition(0, 0);
+	bottomBar->setAnchorPoint(cocos2d::Vec2::ZERO);
+	bottomBar->setContentSize(cocos2d::Size(mUILayer->getContentSize().width, 20));
+	bottomBar->setTag(301);
+	mUILayer->addChild(bottomBar);
 	
-	updateDivisor(3);
+	mPreviousDivisorLabel = cocos2d::Label::createWithTTF("", "fonts/default.ttf", 8);
+	mPreviousDivisorLabel->setPosition(bottomBar->getContentSize().width * 0.2f, bottomBar->getContentSize().height/2);
+	bottomBar->addChild(mPreviousDivisorLabel);
+	
+	mCurrentDivisorLabel = cocos2d::Label::createWithTTF("", "fonts/default.ttf", 10);
+	mCurrentDivisorLabel->setPosition(bottomBar->getContentSize().width * 0.5f, bottomBar->getContentSize().height/2);
+	bottomBar->addChild(mCurrentDivisorLabel);
+	
+	mNextDivisorLabel = cocos2d::Label::createWithTTF("", "fonts/default.ttf", 8);
+	mNextDivisorLabel->setPosition(bottomBar->getContentSize().width * 0.8f, bottomBar->getContentSize().height/2);
+	mNextDivisorLabel->setVisible(false);
+	bottomBar->addChild(mNextDivisorLabel);
+	
+	mSpawnInterval = 0.5f;
+	mWaveLength = 15.0f;
+	mWaveDelay = 2.0f;
+	
+	mCurrentDivisor = -1;
+	updateDivisor(DIVISORS[rand() % DIVISORS_SIZE]);
 	
 	return true;
 }
@@ -368,6 +392,33 @@ void GameMode2Scene::update(float dt)
 	GameScene::update(dt);
 	
 	mGameLayer->setPositionY(mGameLayer->getPositionY() - dt * 30);
+	
+	mWaveTimer += dt;
+	
+	if (mWaveTimer >= mWaveLength)
+	{
+		mWaveTimer = 0;
+		mWaveNumber++;
+		
+		mSpawnTimer -= mWaveDelay;
+		
+		pick_number:
+		int d = DIVISORS[rand() % DIVISORS_SIZE];
+		if ((d == mCurrentDivisor || d == mPreviousDivisor) && DIVISORS_SIZE > 2)
+			goto pick_number;
+		
+		mNextDivisor = d;
+		mNextDivisorLabel->setVisible(true);
+		mNextDivisorLabel->setString(cocos2d::__String::createWithFormat("%d", d)->_string);
+		mNextDivisorLabel->runAction(cocos2d::Sequence::create(cocos2d::DelayTime::create(mWaveDelay),
+				cocos2d::CallFuncN::create([this] (cocos2d::Node* node) {
+			node->setVisible(false);
+			updateDivisor(mNextDivisor);
+		}), nullptr));
+		
+		cocos2d::log("selected divisor %d", d);
+	}
+
 }
 
 void GameMode2Scene::updateSlow(float dt)
@@ -392,7 +443,13 @@ void GameMode2Scene::updateSlow(float dt)
 
 void GameMode2Scene::updateDivisor(int d)
 {
+	mPreviousDivisor = mCurrentDivisor;
 	mCurrentDivisor = d;
+	
+	if (mPreviousDivisor > 0)
+		mPreviousDivisorLabel->setString(cocos2d::__String::createWithFormat("%d", mPreviousDivisor)->_string);
+	mCurrentDivisorLabel->setString(cocos2d::__String::createWithFormat("%d", mCurrentDivisor)->_string);
+	mNextDivisorLabel->setVisible(false);
 }
 
 void GameMode2Scene::spawnBall()
