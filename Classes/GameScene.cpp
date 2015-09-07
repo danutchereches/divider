@@ -377,9 +377,9 @@ bool GameMode2Scene::init()
 	mNextDivisorLabel->setVisible(false);
 	bottomBar->addChild(mNextDivisorLabel);
 	
-	mSpawnInterval = 0.5f;
-	mWaveLength = 15.0f;
-	mWaveDelay = 2.0f;
+	mSpawnInterval = 1.2f;
+	mWaveLength = 30.0f;
+	mWaveDelay = 6.0f;
 	
 	mCurrentDivisor = -1;
 	updateDivisor(DIVISORS[rand() % DIVISORS_SIZE]);
@@ -391,7 +391,7 @@ void GameMode2Scene::update(float dt)
 {
 	GameScene::update(dt);
 	
-	mGameLayer->setPositionY(mGameLayer->getPositionY() - dt * 30);
+	mGameLayer->setPositionY(mGameLayer->getPositionY() + dt * 30);
 	
 	mWaveTimer += dt;
 	
@@ -430,7 +430,7 @@ void GameMode2Scene::updateSlow(float dt)
 		while (!mBalls.empty())
 		{
 			Ball* ball = mBalls.front();
-			if (ball->getPositionY() < -mGameLayer->getPositionY())
+			if (ball->getPositionY() > -mGameLayer->getPositionY() + mScreenSize.height)
 			{
 				mBallPool.recyclePoolItem(ball);
 				mBalls.eraseObject(ball);
@@ -455,7 +455,7 @@ void GameMode2Scene::updateDivisor(int d)
 void GameMode2Scene::spawnBall()
 {
 	Ball* ball = mBallPool.obtainPoolItem();
-	ball->setPosition(rand() % (int) mGameLayer->getContentSize().width, -mGameLayer->getPositionY() + mScreenSize.height);
+	ball->setPosition(rand() % (int) mGameLayer->getContentSize().width, -mGameLayer->getPositionY());
 	ball->setNumber(NUMBER_POOL[rand() % NUMBER_POOL_SIZE]);
 	ball->setColor(cocos2d::Color3B(55+rand() % 200, 55+rand() % 200, 55+rand() % 200));
 	ball->setVisible(true);
