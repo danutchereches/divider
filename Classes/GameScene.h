@@ -88,6 +88,8 @@ public:
 	CREATE_FUNC(GameMode2Scene);
 protected:
 	
+	float mBallSpeed; // pixels per second
+	
 	int mWaveNumber;
 	float mWaveTimer;
 	float mWaveLength;

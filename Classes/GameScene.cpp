@@ -377,7 +377,6 @@ bool GameMode2Scene::init()
 	mNextDivisorLabel->setVisible(false);
 	bottomBar->addChild(mNextDivisorLabel);
 	
-	mSpawnInterval = 1.2f;
 	mWaveLength = 30.0f;
 	
 	mWaveNumber = 1;
@@ -393,6 +392,32 @@ void GameMode2Scene::update(float dt)
 	{
 		if (mBalls.size() == 0)
 		{
+			if (mWaveNumber <= 2)
+			{
+				mBallSpeed = 10.0f;
+				mSpawnInterval = 3.0f;
+			}
+			else if (mWaveNumber <= 5)
+			{
+				mBallSpeed = 15.0f;
+				mSpawnInterval = 2.5f;
+			}
+			else if (mWaveNumber <= 10)
+			{
+				mBallSpeed = 20.0f;
+				mSpawnInterval = 2.0f;
+			}
+			else if (mWaveNumber <= 15)
+			{
+				mBallSpeed = 25.0f;
+				mSpawnInterval = 1.5f;
+			}
+			else
+			{
+				mBallSpeed = 30.0f;
+				mSpawnInterval = 1.2f;
+			}
+			
 			mSpawnTimer = mSpawnInterval;
 			mWaveTimer += dt;
 			
@@ -405,7 +430,7 @@ void GameMode2Scene::update(float dt)
 				updateScore();
 			}
 		}
-		else
+		else //stall
 		{
 			mSpawnTimer -= mSpawnInterval;
 		}
@@ -417,7 +442,7 @@ void GameMode2Scene::update(float dt)
 	
 	GameScene::update(dt);
 	
-	mGameLayer->setPositionY(mGameLayer->getPositionY() + dt * 30);
+	mGameLayer->setPositionY(mGameLayer->getPositionY() + dt * mBallSpeed);
 	
 	if (mWaveTimer >= mWaveLength)
 	{
