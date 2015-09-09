@@ -2,8 +2,7 @@
 
 int GameScene::NUMBER_POOL_SIZE = 21;
 int GameScene::NUMBER_POOL[] = {10, 12, 14, 15, 18, 20, 21, 25, 27, 28, 32, 35, 36, 42, 45, 48, 50, 54, 56, 64, 68};
-int GameScene::DIVISORS_SIZE = 7;
-int GameScene::DIVISORS[] = {3, 4, 5, 6, 7, 8, 9};
+int GameScene::DIVISORS[] = {2, 3, 4, 5, 6, 7, 8, 9};
 
 bool GameScene::init()
 {
@@ -43,6 +42,9 @@ bool GameScene::init()
 	
 	mBallZOrder = 999999;
 	mSpawnTimer = 0;
+	
+	mDivisorMin = 0;
+	mDivisorMax = sizeof(DIVISORS) / sizeof(int);
 	
 	mScore = 0;
 	updateScore();
@@ -89,7 +91,7 @@ void GameScene::checkNumbers()
 	for (int i = 0; i < NUMBER_POOL_SIZE; i++)
 	{
 		int m = 0;
-		for (int j = 0; j < DIVISORS_SIZE; j++)
+		for (int j = 0; j < mDivisorMax; j++)
 			if (NUMBER_POOL[i] % DIVISORS[j] == 0)
 				m++;
 		
@@ -104,7 +106,7 @@ void GameScene::checkNumbers()
 	}
 	
 	cocos2d::log("\nCounting numbers in pool for each divisor:");
-	for (int i = 0; i < DIVISORS_SIZE; i++)
+	for (int i = mDivisorMin; i < mDivisorMax; i++)
 	{
 		int m = 0;
 		for (int j = 0; j < NUMBER_POOL_SIZE; j++)
@@ -237,6 +239,8 @@ bool GameMode1Scene::init()
 	if (!GameScene::init())
 		return false;
 	
+	mDivisorMin = 1;
+	
 	cocos2d::LayerColor* bottomBar = cocos2d::LayerColor::create(cocos2d::Color4B(200, 100, 100, 255));
 	bottomBar->ignoreAnchorPointForPosition(false);
 	bottomBar->setPosition(0, 0);
@@ -252,7 +256,7 @@ bool GameMode1Scene::init()
 	bottomMenu->setContentSize(bottomBar->getContentSize());
 	bottomBar->addChild(bottomMenu);
 	
-	float dw = bottomBar->getContentSize().width / DIVISORS_SIZE;
+	float dw = bottomBar->getContentSize().width / (mDivisorMax - mDivisorMin);
 	std::function<void(cocos2d::Ref*)> callback = [this](cocos2d::Ref* node) {
 		cocos2d::MenuItem* menuItem = dynamic_cast<cocos2d::MenuItem*>(node);
 		if (menuItem == nullptr)
@@ -263,13 +267,13 @@ bool GameMode1Scene::init()
 	//	if (divisor == nullptr)
 	//		return;
 	};
-	for (int i = 0; i < DIVISORS_SIZE; i++)
+	for (int i = mDivisorMin; i < mDivisorMax; i++)
 	{
 		cocos2d::Label* label = cocos2d::Label::createWithTTF(cocos2d::__String::createWithFormat("%d", DIVISORS[i])->_string, "fonts/default.ttf", 12);
 		cocos2d::MenuItemLabel* divisor = cocos2d::MenuItemLabel::create(label, callback);
 		label->setPosition(cocos2d::Vec2(dw/2, bottomBar->getContentSize().height/2));
 		label->setAnchorPoint(cocos2d::Vec2::ANCHOR_MIDDLE);
-		divisor->setPosition(i * dw, 0);
+		divisor->setPosition((i - mDivisorMin) * dw, 0);
 		divisor->setContentSize(cocos2d::Size(dw, bottomBar->getContentSize().height));
 		divisor->setAnchorPoint(cocos2d::Vec2::ZERO);
 		divisor->setTag(DIVISORS[i]);
@@ -289,9 +293,9 @@ void GameMode1Scene::updateDivisor(int d)
 	
 	cocos2d::Node* menu = mUILayer->getChildByTag(301)->getChildren().front();//UberHack!
 	cocos2d::Vector<cocos2d::Node*> items = menu->getChildren();
-	if (items.size() != DIVISORS_SIZE)
+	if (items.size() != (mDivisorMax - mDivisorMin))
 	{
-		cocos2d::log("ERROR: wrong number of items in divisors menu. (%d vs %d required)", (int) items.size(), DIVISORS_SIZE);
+		cocos2d::log("ERROR: wrong number of items in divisors menu. (%d vs %d required)", (int) items.size(), (mDivisorMax - mDivisorMin));
 		AppDelegate::closeApp();
 		return;
 	}
@@ -381,7 +385,7 @@ bool GameMode2Scene::init()
 	
 	mWaveNumber = 1;
 	mCurrentDivisor = -1;
-	mNextDivisor = DIVISORS[rand() % DIVISORS_SIZE];
+	mNextDivisor = DIVISORS[mDivisorMin + rand() % (mDivisorMax - mDivisorMin)];
 	
 	return true;
 }
@@ -450,8 +454,8 @@ void GameMode2Scene::update(float dt)
 		mWaveNumber++;
 		
 		pick_number:
-		int d = DIVISORS[rand() % DIVISORS_SIZE];
-		if ((d == mCurrentDivisor || d == mPreviousDivisor) && DIVISORS_SIZE > 2)
+		int d = DIVISORS[mDivisorMin + rand() % (mDivisorMax - mDivisorMin)];;
+		if ((d == mCurrentDivisor || d == mPreviousDivisor) && (mDivisorMax - mDivisorMin) > 2)
 			goto pick_number;
 		
 		mNextDivisor = d;

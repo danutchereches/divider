@@ -15,7 +15,6 @@ public:
 	
 	static int NUMBER_POOL_SIZE;
 	static int NUMBER_POOL[];
-	static int DIVISORS_SIZE;
 	static int DIVISORS[];
 	
 	virtual GameScene* clone() const = 0;
@@ -34,11 +33,14 @@ protected:
 	int mBallZOrder;
 	int mCurrentDivisor;
 	
-	bool mIsGameServicesAvailable;
+	int mDivisorMin;
+	int mDivisorMax;
 	float mSpawnTimer;
 	float mSpawnInterval;
 	
 	int mScore;
+	
+	bool mIsGameServicesAvailable;
 	
 	void checkNumbers();
 	void initPools();
