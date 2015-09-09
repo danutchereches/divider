@@ -106,6 +106,10 @@ protected:
 	void update(float dt) override;
 	void updateSlow(float dt) override;
 	
+	void startWave();
+	void endWave();
+	void setDivisorRange();
+	
 	void updateDivisor(int d) override;
 	void spawnBall() override;
 	void divideBall(Ball* ball) override;

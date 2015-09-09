@@ -2,7 +2,7 @@
 
 int GameScene::NUMBER_POOL_SIZE = 21;
 int GameScene::NUMBER_POOL[] = {10, 12, 14, 15, 18, 20, 21, 25, 27, 28, 32, 35, 36, 42, 45, 48, 50, 54, 56, 64, 68};
-int GameScene::DIVISORS[] = {2, 3, 4, 5, 6, 7, 8, 9};
+int GameScene::DIVISORS[] = {2, 5, 3, 4, 6, 7, 8, 9};
 
 bool GameScene::init()
 {
@@ -381,11 +381,14 @@ bool GameMode2Scene::init()
 	mNextDivisorLabel->setVisible(false);
 	bottomBar->addChild(mNextDivisorLabel);
 	
+	mWaveTimer = 0;
 	mWaveLength = 30.0f;
 	
-	mWaveNumber = 1;
+	mWaveNumber = cocos2d::UserDefault::getInstance()->getBoolForKey("skip_tutorial", false) ? 1 : 0;
 	mCurrentDivisor = -1;
-	mNextDivisor = DIVISORS[mDivisorMin + rand() % (mDivisorMax - mDivisorMin)];
+	mNextDivisor = -1;
+	
+	setDivisorRange();
 	
 	return true;
 }
@@ -396,43 +399,10 @@ void GameMode2Scene::update(float dt)
 	{
 		if (mBalls.size() == 0)
 		{
-			if (mWaveNumber <= 2)
-			{
-				mBallSpeed = 10.0f;
-				mSpawnInterval = 3.0f;
-			}
-			else if (mWaveNumber <= 5)
-			{
-				mBallSpeed = 15.0f;
-				mSpawnInterval = 2.5f;
-			}
-			else if (mWaveNumber <= 10)
-			{
-				mBallSpeed = 20.0f;
-				mSpawnInterval = 2.0f;
-			}
-			else if (mWaveNumber <= 15)
-			{
-				mBallSpeed = 25.0f;
-				mSpawnInterval = 1.5f;
-			}
-			else
-			{
-				mBallSpeed = 30.0f;
-				mSpawnInterval = 1.2f;
-			}
+			startWave();
 			
 			mSpawnTimer = mSpawnInterval;
 			mWaveTimer += dt;
-			
-			mNextDivisorLabel->setVisible(false);
-			updateDivisor(mNextDivisor);
-			
-			if (mWaveNumber > 1)
-			{
-				mScore += 5;
-				updateScore();
-			}
 		}
 		else //stall
 		{
@@ -451,20 +421,9 @@ void GameMode2Scene::update(float dt)
 	if (mWaveTimer >= mWaveLength)
 	{
 		mWaveTimer = 0;
-		mWaveNumber++;
 		
-		pick_number:
-		int d = DIVISORS[mDivisorMin + rand() % (mDivisorMax - mDivisorMin)];;
-		if ((d == mCurrentDivisor || d == mPreviousDivisor) && (mDivisorMax - mDivisorMin) > 2)
-			goto pick_number;
-		
-		mNextDivisor = d;
-		mNextDivisorLabel->setVisible(true);
-		mNextDivisorLabel->setString(cocos2d::__String::createWithFormat("%d", d)->_string);
-		
-		cocos2d::log("selected divisor %d", d);
+		endWave();
 	}
-
 }
 
 void GameMode2Scene::updateSlow(float dt)
@@ -487,6 +446,114 @@ void GameMode2Scene::updateSlow(float dt)
 			else
 				break;
 		}
+	}
+}
+
+void GameMode2Scene::startWave()
+{
+	if (mWaveNumber == 0)
+		mWaveLength = 20;
+	else
+		mWaveLength = 30;
+	
+	if (mWaveNumber == 0)       // difficulty for wave 0
+	{
+		mBallSpeed = 8.0f;
+		mSpawnInterval = 4.0f;
+	}
+	else if (mWaveNumber <= 1)  // difficulty for wave 1
+	{
+		mBallSpeed = 10.0f;
+		mSpawnInterval = 3.0f;
+	}
+	else if (mWaveNumber <= 3)  // difficulty for wave 2, 3
+	{
+		mBallSpeed = 15.0f;
+		mSpawnInterval = 2.5f;
+	}
+	else if (mWaveNumber <= 6)  // difficulty for wave 4, 5, 6
+	{
+		mBallSpeed = 20.0f;
+		mSpawnInterval = 2.0f;
+	}
+	else if (mWaveNumber <= 10) // difficulty for wave 7, 8, 9, 10
+	{
+		mBallSpeed = 25.0f;
+		mSpawnInterval = 1.5f;
+	}
+	else                        // difficulty for wave 11+
+	{
+		mBallSpeed = 30.0f;
+		mSpawnInterval = 1.2f;
+	}
+	
+	if (mNextDivisor == -1) // first wave
+	{
+		mNextDivisor = DIVISORS[mDivisorMin + rand() % (mDivisorMax - mDivisorMin)];
+	}
+	
+	mNextDivisorLabel->setVisible(false);
+	updateDivisor(mNextDivisor);
+	
+	if (mWaveNumber > 1)
+	{
+		mScore += 5;
+		updateScore();
+	}
+}
+
+void GameMode2Scene::endWave()
+{
+	if (mWaveNumber == 0)
+		cocos2d::UserDefault::getInstance()->setBoolForKey("skip_tutorial", true);
+	
+	mWaveNumber++;
+	
+	setDivisorRange();
+	
+	pick_number:
+	int d = DIVISORS[mDivisorMin + rand() % (mDivisorMax - mDivisorMin)];;
+	if ((d == mCurrentDivisor || d == mPreviousDivisor) && (mDivisorMax - mDivisorMin) > 2)
+		goto pick_number;
+	
+	mNextDivisor = d;
+	mNextDivisorLabel->setVisible(true);
+	mNextDivisorLabel->setString(cocos2d::__String::createWithFormat("%d", d)->_string);
+	
+	cocos2d::log("selected divisor %d", d);
+}
+
+void GameMode2Scene::setDivisorRange()
+{
+	if (mWaveNumber == 0)       // difficulty for wave 0
+	{
+		mDivisorMin = 0;
+		mDivisorMax = 1;
+	}
+	else if (mWaveNumber <= 1)  // difficulty for wave 1
+	{
+		mDivisorMin = 0;
+		mDivisorMax = 3;
+	}
+	else if (mWaveNumber <= 3)  // difficulty for wave 2, 3
+	{
+		mDivisorMin = 1;
+		mDivisorMax = 4;
+	}
+	else if (mWaveNumber <= 6)  // difficulty for wave 4, 5, 6
+	{
+		mDivisorMin = 2;
+		mDivisorMax = 5;
+	}
+	else if (mWaveNumber <= 10) // difficulty for wave 7, 8, 9, 10
+	{
+		mDivisorMin = 2;
+		mDivisorMax = 7;
+	}
+	else                        // difficulty for wave 11+
+	{
+		mDivisorMin = 2;
+		mDivisorMax = 8;
 	}
 }
 
