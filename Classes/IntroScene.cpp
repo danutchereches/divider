@@ -1,16 +1,16 @@
-#include "MenuScene.h"
+#include "IntroScene.h"
 
-MenuScene::MenuScene()
+IntroScene::IntroScene()
 {
-	cocos2d::log("menu scene constructed");
+	cocos2d::log("intro scene constructed");
 }
 
-MenuScene::~MenuScene()
+IntroScene::~IntroScene()
 {
-	cocos2d::log("menu scene destructed");
+	cocos2d::log("intro scene destructed");
 }
 
-bool MenuScene::init()
+bool IntroScene::init()
 {
 	if (!cocos2d::Scene::init())
 		return false;

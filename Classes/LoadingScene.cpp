@@ -52,6 +52,6 @@ void LoadingScene::load(float dt)
 	
 	unschedule(schedule_selector(LoadingScene::load));
 	
-	auto scene = MenuScene::create();
+	auto scene = IntroScene::create();
 	cocos2d::Director::getInstance()->replaceScene(scene);
 }

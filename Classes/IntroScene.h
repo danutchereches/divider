@@ -4,14 +4,14 @@
 #include "GameScene.h"
 #include "Helpers.h"
 
-class MenuScene : public cocos2d::Scene {
+class IntroScene : public cocos2d::Scene {
 public:
-	MenuScene();
-	~MenuScene();
+	IntroScene();
+	~IntroScene();
 	
 	virtual bool init() override;
 	
-	CREATE_FUNC(MenuScene);
+	CREATE_FUNC(IntroScene);
 private:
 	cocos2d::Size mScreenSize;
 	cocos2d::Size mVisibleSize;
