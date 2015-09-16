@@ -375,13 +375,84 @@ bool GameMode2Scene::init()
 	barBg->setAnchorPoint(cocos2d::Vec2(0.5f, 0));
 	bottomBar->addChild(barBg);
 	
-	mPreviousDivisorLabel = cocos2d::Label::createWithTTF("", "fonts/default.ttf", 7);
-	mPreviousDivisorLabel->setPosition(bottomBar->getContentSize().width * 0.2f, bottomBar->getContentSize().height/2);
-	bottomBar->addChild(mPreviousDivisorLabel);
-	
 	mCurrentDivisorLabel = cocos2d::Label::createWithTTF("", "fonts/default.ttf", 9);
 	mCurrentDivisorLabel->setPosition(bottomBar->getContentSize().width * 0.478f, bottomBar->getContentSize().height/2);
 	bottomBar->addChild(mCurrentDivisorLabel);
+	
+	mCurrentDivisor = -1;
+	
+	return true;
+}
+
+void GameMode2Scene::update(float dt)
+{
+	GameScene::update(dt);
+	
+	mGameLayer->setPositionY(mGameLayer->getPositionY() + dt * mBallSpeed);
+}
+
+void GameMode2Scene::updateSlow(float dt)
+{
+	GameScene::updateSlow(dt);
+	
+	if (mBalls.size() > 0)
+	{
+		while (!mBalls.empty())
+		{
+			Ball* ball = mBalls.front();
+			if (ball->getPositionY() > -mGameLayer->getPositionY() + mScreenSize.height)
+			{
+				mBallPool.recyclePoolItem(ball);
+				mBalls.eraseObject(ball);
+				
+				if (ball->getNumber() % mCurrentDivisor == 0)
+					missBall(ball, false);
+			}
+			else
+				break;
+		}
+	}
+}
+
+void GameMode2Scene::updateDivisor(int d)
+{
+	mCurrentDivisor = d;
+	mCurrentDivisorLabel->setString(cocos2d::__String::createWithFormat("%d", mCurrentDivisor)->_string);
+}
+
+void GameMode2Scene::spawnBall()
+{
+	Ball* ball = mBallPool.obtainPoolItem();
+	ball->setPosition(rand() % (int) mGameLayer->getContentSize().width, -mGameLayer->getPositionY());
+	ball->setNumber(NUMBER_POOL[rand() % NUMBER_POOL_SIZE]);
+	ball->setColor(cocos2d::Color3B(55+rand() % 200, 55+rand() % 200, 55+rand() % 200));
+	ball->setVisible(true);
+	ball->setLocalZOrder(mBallZOrder--);
+	ball->setScale(0.5f);
+	mBalls.pushBack(ball);
+}
+
+void GameMode2Scene::divideBall(Ball* ball)
+{
+	mBallPool.recyclePoolItem(ball);
+	mBalls.eraseObject(ball);
+}
+
+void GameMode2Scene::missBall(Ball* ball)
+{
+	missBall(ball, true);
+}
+
+bool GameMode2InfiniteScene::init()
+{
+	if (!GameMode2Scene::init())
+		return false;
+	
+	cocos2d::Node* bottomBar = mUILayer->getChildByTag(301);
+	
+	mPreviousDivisorLabel = cocos2d::Label::createWithTTF("", "fonts/default.ttf", 7);
+	mPreviousDivisorLabel->setPosition(bottomBar->getContentSize().width * 0.2f, bottomBar->getContentSize().height/2);
+	bottomBar->addChild(mPreviousDivisorLabel);
 	
 	mNextDivisorLabel = cocos2d::Label::createWithTTF("", "fonts/default.ttf", 7);
 	mNextDivisorLabel->setPosition(bottomBar->getContentSize().width * 0.8f, bottomBar->getContentSize().height/2);
@@ -400,7 +471,7 @@ bool GameMode2Scene::init()
 	return true;
 }
 
-void GameMode2Scene::update(float dt)
+void GameMode2InfiniteScene::update(float dt)
 {
 	if (mWaveTimer == 0) // if starting new wave, wait for all balls to go out of the screen
 	{
@@ -421,9 +492,7 @@ void GameMode2Scene::update(float dt)
 		mWaveTimer += dt;
 	}
 	
-	GameScene::update(dt);
-	
-	mGameLayer->setPositionY(mGameLayer->getPositionY() + dt * mBallSpeed);
+	GameMode2Scene::update(dt);
 	
 	if (mWaveTimer >= mWaveLength)
 	{
@@ -433,30 +502,13 @@ void GameMode2Scene::update(float dt)
 	}
 }
 
-void GameMode2Scene::updateSlow(float dt)
+void GameMode2InfiniteScene::updateSlow(float dt)
 {
-	GameScene::updateSlow(dt);
+	GameMode2Scene::updateSlow(dt);
 	
-	if (mBalls.size() > 0)
-	{
-		while (!mBalls.empty())
-		{
-			Ball* ball = mBalls.front();
-			if (ball->getPositionY() > -mGameLayer->getPositionY() + mScreenSize.height)
-			{
-				mBallPool.recyclePoolItem(ball);
-				mBalls.eraseObject(ball);
-				
-				if (ball->getNumber() % mCurrentDivisor == 0)
-					missBall(ball);
-			}
-			else
-				break;
-		}
-	}
 }
 
-void GameMode2Scene::startWave()
+void GameMode2InfiniteScene::startWave()
 {
 	if (mWaveNumber == 0)
 		mWaveLength = 20;
@@ -509,7 +561,7 @@ void GameMode2Scene::startWave()
 	}
 }
 
-void GameMode2Scene::endWave()
+void GameMode2InfiniteScene::endWave()
 {
 	if (mWaveNumber == 0)
 		cocos2d::UserDefault::getInstance()->setBoolForKey("skip_tutorial", true);
@@ -530,7 +582,7 @@ void GameMode2Scene::endWave()
 	cocos2d::log("selected divisor %d", d);
 }
 
-void GameMode2Scene::setDivisorRange()
+void GameMode2InfiniteScene::setDivisorRange()
 {
 	if (mWaveNumber == 0)       // difficulty for wave 0
 	{
@@ -564,48 +616,123 @@ void GameMode2Scene::setDivisorRange()
 	}
 }
 
-void GameMode2Scene::updateDivisor(int d)
+void GameMode2InfiniteScene::updateDivisor(int d)
 {
 	if (mBalls.size() > 0)
 		cocos2d::log("WARNING: Screen is not empty! Divisor shouldn't change while balls are still on screen!");
 	
 	mPreviousDivisor = mCurrentDivisor;
-	mCurrentDivisor = d;
 	
 	if (mPreviousDivisor > 0)
 		mPreviousDivisorLabel->setString(cocos2d::__String::createWithFormat("%d", mPreviousDivisor)->_string);
-	mCurrentDivisorLabel->setString(cocos2d::__String::createWithFormat("%d", mCurrentDivisor)->_string);
 	mNextDivisorLabel->setVisible(false);
+	
+	GameMode2Scene::updateDivisor(d);
 }
 
-void GameMode2Scene::spawnBall()
+void GameMode2InfiniteScene::divideBall(Ball* ball)
 {
-	Ball* ball = mBallPool.obtainPoolItem();
-	ball->setPosition(rand() % (int) mGameLayer->getContentSize().width, -mGameLayer->getPositionY());
-	ball->setNumber(NUMBER_POOL[rand() % NUMBER_POOL_SIZE]);
-	ball->setColor(cocos2d::Color3B(55+rand() % 200, 55+rand() % 200, 55+rand() % 200));
-	ball->setVisible(true);
-	ball->setLocalZOrder(mBallZOrder--);
-	ball->setScale(0.5f);
-	mBalls.pushBack(ball);
-}
-
-void GameMode2Scene::divideBall(Ball* ball)
-{
-	mBallPool.recyclePoolItem(ball);
-	mBalls.eraseObject(ball);
+	GameMode2Scene::divideBall(ball);
 	
 	mScore++;
 	updateScore();
 }
 
-void GameMode2Scene::missBall(Ball* ball)
+void GameMode2InfiniteScene::missBall(Ball* ball, bool manual)
 {
 	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("die.wav");
 	cocos2d::Director::getInstance()->replaceScene(clone());
 }
 
-GameScene* GameMode2Scene::clone() const
+GameScene* GameMode2InfiniteScene::clone() const
 {
-	return GameMode2Scene::create();
+	return GameMode2InfiniteScene::create();
+}
+
+GameMode2LevelScene* GameMode2LevelScene::create(int level)
+{
+	GameMode2LevelScene* scene = new (std::nothrow) GameMode2LevelScene();
+	
+	if (scene && scene->initWithLevelNumber(level))
+	{
+		scene->autorelease();
+		return scene;
+	}
+	else
+	{
+		delete scene;
+		scene = nullptr;
+		return nullptr;
+	}
+}
+
+bool GameMode2LevelScene::initWithLevelNumber(int level)
+{
+	if (!GameMode2Scene::init())
+		return false;
+	
+	mLevelNumber = level;
+	
+	switch (mLevelNumber)
+	{
+		case 1:
+			mBallSpeed = 8.0f;
+			mSpawnInterval = 0.5f;
+			mCurrentDivisor = 2;
+			break;
+		case 2:
+			mBallSpeed = 9.0f;
+			mSpawnInterval = 0.45f;
+			mCurrentDivisor = 5;
+			break;
+		case 3:
+			mBallSpeed = 10.0f;
+			mSpawnInterval = 0.4f;
+			mCurrentDivisor = 3;
+			break;
+		default:
+			return false;
+	}
+	
+	updateDivisor(mCurrentDivisor);
+	
+	return true;
+}
+
+void GameMode2LevelScene::update(float dt)
+{
+	GameMode2Scene::update(dt);
+	
+}
+
+void GameMode2LevelScene::updateSlow(float dt)
+{
+	GameMode2Scene::updateSlow(dt);
+	
+}
+
+void GameMode2LevelScene::divideBall(Ball* ball)
+{
+	GameMode2Scene::divideBall(ball);
+	
+	mScore++;
+	updateScore();
+}
+
+void GameMode2LevelScene::missBall(Ball* ball, bool manual)
+{
+	if (manual)
+	{
+		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("die.wav");
+		cocos2d::Director::getInstance()->replaceScene(clone());
+	}
+	else
+	{
+		//TODO: maybe affect score
+	}
+}
+
+GameScene* GameMode2LevelScene::clone() const
+{
+	return GameMode2LevelScene::create(mLevelNumber);
 }

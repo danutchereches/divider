@@ -43,7 +43,7 @@ bool IntroScene::init()
 	
 	auto mode2Btn = cocos2d::MenuItemLabel::create(cocos2d::Label::createWithTTF("mode 2", "fonts/default.ttf", 12),
 			[] (cocos2d::Ref* btn) {
-		cocos2d::Director::getInstance()->pushScene(GameMode2Scene::create());
+		cocos2d::Director::getInstance()->pushScene(GameMode2InfiniteScene::create());
 	});
 	mode2Btn->setPosition(cocos2d::Vec2(mVisibleSize.width/2, mVisibleSize.height * 0.5f));
 	menu->addChild(mode2Btn);

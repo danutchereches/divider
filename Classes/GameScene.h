@@ -85,12 +85,31 @@ class GameMode2Scene : public GameScene
 public:
 	bool init() override;
 	
-	GameScene* clone() const override;
-	
-	CREATE_FUNC(GameMode2Scene);
 protected:
 	
 	float mBallSpeed; // pixels per second
+	
+	cocos2d::Label* mCurrentDivisorLabel;
+	
+	virtual void update(float dt) override;
+	virtual void updateSlow(float dt) override;
+	
+	virtual void updateDivisor(int d) override;
+	virtual void spawnBall() override;
+	virtual void divideBall(Ball* ball) override;
+	virtual void missBall(Ball* ball) override;
+	virtual void missBall(Ball* ball, bool manual) = 0;
+};
+
+class GameMode2InfiniteScene : public GameMode2Scene
+{
+public:
+	bool init() override;
+	
+	GameScene* clone() const override;
+	
+	CREATE_FUNC(GameMode2InfiniteScene);
+protected:
 	
 	int mWaveNumber;
 	float mWaveTimer;
@@ -100,7 +119,6 @@ protected:
 	int mNextDivisor;
 	
 	cocos2d::Label* mPreviousDivisorLabel;
-	cocos2d::Label* mCurrentDivisorLabel;
 	cocos2d::Label* mNextDivisorLabel;
 	
 	void update(float dt) override;
@@ -111,9 +129,27 @@ protected:
 	void setDivisorRange();
 	
 	void updateDivisor(int d) override;
-	void spawnBall() override;
-	void divideBall(Ball* ball) override;
-	void missBall(Ball* ball) override;
+	virtual void divideBall(Ball* ball) override;
+	virtual void missBall(Ball* ball, bool manual) override;
+};
+
+class GameMode2LevelScene : public GameMode2Scene
+{
+public:
+	virtual bool initWithLevelNumber(int level);
+	inline int getLevelNumber() { return mLevelNumber; }
+	
+	GameScene* clone() const override;
+	
+	static GameMode2LevelScene* create(int level);
+protected:
+	int mLevelNumber;
+	
+	virtual void update(float dt) override;
+	virtual void updateSlow(float dt) override;
+	
+	virtual void divideBall(Ball* ball) override;
+	virtual void missBall(Ball* ball, bool manual) override;
 };
 
 #endif // __GAMESCENE_H__

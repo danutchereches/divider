@@ -57,8 +57,8 @@ bool LevelSelectScene::init()
 			
 			if (levelNr <= 1)
 			{
-				menuItem->setCallback([] (cocos2d::Ref* btn) {
-					cocos2d::Director::getInstance()->pushScene(GameMode1Scene::create());
+				menuItem->setCallback([levelNr] (cocos2d::Ref* btn) {
+					cocos2d::Director::getInstance()->pushScene(GameMode2LevelScene::create(levelNr));
 				});
 			}
 			else
