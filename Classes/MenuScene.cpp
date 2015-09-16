@@ -19,7 +19,7 @@ bool MenuScene::init()
 	mVisibleSize = cocos2d::Director::getInstance()->getVisibleSize();
 	mOrigin = cocos2d::Director::getInstance()->getVisibleOrigin();
 	
-	cocos2d::LayerColor* bg = cocos2d::LayerColor::create(cocos2d::Color4B(44, 44, 44, 255));
+	cocos2d::LayerColor* bg = cocos2d::LayerColor::create(cocos2d::Color4B(0, 0, 30, 255));
 	this->addChild(bg);
 	
 	auto logo = cocos2d::Label::createWithTTF("DIVIDER", "fonts/default.ttf", 22);

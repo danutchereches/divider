@@ -21,12 +21,15 @@ bool GameScene::init()
 	cocos2d::log("visible size %f, %f", mVisibleSize.width, mVisibleSize.height);
 	cocos2d::log("offset %f, %f", mOrigin.x, mOrigin.y);
 	
-	mGameLayer = cocos2d::Layer::create();
-	mGameLayer->ignoreAnchorPointForPosition(false);
+	cocos2d::LayerColor* bg = cocos2d::LayerColor::create(cocos2d::Color4B(0, 0, 30, 255));;
+	this->addChild(bg, 100);
+	
+	mGameLayer = cocos2d::Node::create();
+//	mGameLayer->ignoreAnchorPointForPosition(false);
 	mGameLayer->setPosition(cocos2d::Vec2(mOrigin.x, mOrigin.y + 20));
 	mGameLayer->setAnchorPoint(cocos2d::Vec2::ZERO);
 	mGameLayer->setContentSize(cocos2d::Size(mVisibleSize.width, mVisibleSize.height - 20));
-	this->addChild(mGameLayer, 100);
+	bg->addChild(mGameLayer, 100);
 	
 	mUILayer = cocos2d::Layer::create();
 	mUILayer->ignoreAnchorPointForPosition(false);
@@ -360,23 +363,27 @@ bool GameMode2Scene::init()
 	if (!GameScene::init())
 		return false;
 	
-	cocos2d::LayerColor* bottomBar = cocos2d::LayerColor::create(cocos2d::Color4B(200, 100, 100, 255));
-	bottomBar->ignoreAnchorPointForPosition(false);
+	cocos2d::Node* bottomBar = cocos2d::Node::create();
 	bottomBar->setPosition(0, 0);
 	bottomBar->setAnchorPoint(cocos2d::Vec2::ZERO);
-	bottomBar->setContentSize(cocos2d::Size(mUILayer->getContentSize().width, 20));
+	bottomBar->setContentSize(cocos2d::Size(mUILayer->getContentSize().width, 14));
 	bottomBar->setTag(301);
 	mUILayer->addChild(bottomBar);
 	
-	mPreviousDivisorLabel = cocos2d::Label::createWithTTF("", "fonts/default.ttf", 8);
+	cocos2d::Sprite* barBg = cocos2d::Sprite::createWithSpriteFrameName("bottom_bar");
+	barBg->setPosition(bottomBar->getContentSize().width/2, 1.8f);
+	barBg->setAnchorPoint(cocos2d::Vec2(0.5f, 0));
+	bottomBar->addChild(barBg);
+	
+	mPreviousDivisorLabel = cocos2d::Label::createWithTTF("", "fonts/default.ttf", 7);
 	mPreviousDivisorLabel->setPosition(bottomBar->getContentSize().width * 0.2f, bottomBar->getContentSize().height/2);
 	bottomBar->addChild(mPreviousDivisorLabel);
 	
-	mCurrentDivisorLabel = cocos2d::Label::createWithTTF("", "fonts/default.ttf", 10);
-	mCurrentDivisorLabel->setPosition(bottomBar->getContentSize().width * 0.5f, bottomBar->getContentSize().height/2);
+	mCurrentDivisorLabel = cocos2d::Label::createWithTTF("", "fonts/default.ttf", 9);
+	mCurrentDivisorLabel->setPosition(bottomBar->getContentSize().width * 0.478f, bottomBar->getContentSize().height/2);
 	bottomBar->addChild(mCurrentDivisorLabel);
 	
-	mNextDivisorLabel = cocos2d::Label::createWithTTF("", "fonts/default.ttf", 8);
+	mNextDivisorLabel = cocos2d::Label::createWithTTF("", "fonts/default.ttf", 7);
 	mNextDivisorLabel->setPosition(bottomBar->getContentSize().width * 0.8f, bottomBar->getContentSize().height/2);
 	mNextDivisorLabel->setVisible(false);
 	bottomBar->addChild(mNextDivisorLabel);

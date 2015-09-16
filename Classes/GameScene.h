@@ -23,7 +23,7 @@ protected:
 	cocos2d::Size mVisibleSize;
 	cocos2d::Vec2 mOrigin;
 	
-	cocos2d::Layer* mGameLayer;
+	cocos2d::Node* mGameLayer;
 	cocos2d::Layer* mUILayer;
 	
 	cocos2d::Label* mScoreView;

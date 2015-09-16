@@ -42,7 +42,7 @@ bool AppDelegate::applicationDidFinishLaunching()
 	auto glview = director->getOpenGLView();
 	if (!glview)
 	{
-		glview = cocos2d::GLViewImpl::createWithRect(std::string("divider"), cocos2d::Rect(0, 0, 480, 640), 1.0f);
+		glview = cocos2d::GLViewImpl::createWithRect(std::string("divider"), cocos2d::Rect(0, 0, 540, 960), 1.0f);
 		director->setOpenGLView(glview);
 	}
 	
