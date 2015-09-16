@@ -48,12 +48,53 @@ bool IntroScene::init()
 	mode2Btn->setPosition(cocos2d::Vec2(mVisibleSize.width/2, mVisibleSize.height * 0.5f));
 	menu->addChild(mode2Btn);
 	
-	auto exitBtn = cocos2d::MenuItemLabel::create(cocos2d::Label::createWithTTF("EXIT", "fonts/default.ttf", 12),
+	auto mode3Btn = cocos2d::MenuItemLabel::create(cocos2d::Label::createWithTTF("mode 3", "fonts/default.ttf", 12),
+			[] (cocos2d::Ref* btn) {
+		cocos2d::Director::getInstance()->pushScene(LevelSelectScene::create());
+	});
+	mode3Btn->setPosition(cocos2d::Vec2(mVisibleSize.width/2, mVisibleSize.height * 0.35f));
+	menu->addChild(mode3Btn);
+	
+	auto exitBtn = cocos2d::MenuItemLabel::create(cocos2d::Label::createWithTTF("EXIT", "fonts/default.ttf", 10),
 			[] (cocos2d::Ref* btn) {
 		AppDelegate::closeApp();
 	});
-	exitBtn->setPosition(cocos2d::Vec2(mVisibleSize.width/2, mVisibleSize.height * 0.35f));
+	exitBtn->setPosition(cocos2d::Vec2(mVisibleSize.width/2, mVisibleSize.height * 0.15f));
 	menu->addChild(exitBtn);
-
+	
+	auto dispatcher = cocos2d::Director::getInstance()->getEventDispatcher();
+	
+	auto listener = cocos2d::EventListenerKeyboard::create();
+	listener->onKeyPressed = CC_CALLBACK_2(IntroScene::onKeyPressed, this);
+	listener->onKeyReleased = CC_CALLBACK_2(IntroScene::onKeyReleased, this);
+	dispatcher->addEventListenerWithSceneGraphPriority(listener, this);
+	
 	return true;
+}
+
+void IntroScene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event)
+{
+	cocos2d::log("button press %d", (int) keyCode);
+	
+}
+
+void IntroScene::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event)
+{
+	cocos2d::log("button release %d", (int) keyCode);
+	
+	if (keyCode == cocos2d::EventKeyboard::KeyCode::KEY_ESCAPE)
+	{
+		if (AppDelegate::pluginAnalytics != nullptr)
+			AppDelegate::pluginAnalytics->logEvent("click_back_btn");
+		
+		AppDelegate::closeApp();
+	}
+	else if (keyCode == cocos2d::EventKeyboard::KeyCode::KEY_VOLUME_DOWN)
+	{
+		CocosDenshion::SimpleAudioEngine::getInstance()->decreaseVolume();
+	}
+	else if (keyCode == cocos2d::EventKeyboard::KeyCode::KEY_VOLUME_UP)
+	{
+		CocosDenshion::SimpleAudioEngine::getInstance()->increaseVolume();
+	}
 }

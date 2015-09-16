@@ -5,14 +5,14 @@
 #include "LevelSelectScene.h"
 #include "Helpers.h"
 
-class IntroScene : public cocos2d::Scene {
+class LevelSelectScene : public cocos2d::Scene {
 public:
-	IntroScene();
-	~IntroScene();
+	LevelSelectScene();
+	~LevelSelectScene();
 	
 	virtual bool init() override;
 	
-	CREATE_FUNC(IntroScene);
+	CREATE_FUNC(LevelSelectScene);
 private:
 	cocos2d::Size mScreenSize;
 	cocos2d::Size mVisibleSize;
