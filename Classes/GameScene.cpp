@@ -672,6 +672,7 @@ bool GameMode2LevelScene::initWithLevelNumber(int level)
 		return false;
 	
 	mLevelNumber = level;
+	mLevelTimer = 20;
 	
 	switch (mLevelNumber)
 	{
@@ -694,6 +695,11 @@ bool GameMode2LevelScene::initWithLevelNumber(int level)
 			return false;
 	}
 	
+	mTimerLabel = cocos2d::Label::createWithTTF("", "fonts/default.ttf", 10);
+	mTimerLabel->setPosition(cocos2d::Vec2(mUILayer->getContentSize().width - 2, mUILayer->getContentSize().height - 2));
+	mTimerLabel->setAnchorPoint(cocos2d::Vec2(1, 1));
+	mUILayer->addChild(mTimerLabel);
+	
 	updateDivisor(mCurrentDivisor);
 	
 	return true;
@@ -703,6 +709,18 @@ void GameMode2LevelScene::update(float dt)
 {
 	GameMode2Scene::update(dt);
 	
+	int oldTimer = mLevelTimer;
+	mLevelTimer -= dt;
+	if (oldTimer != (int) mLevelTimer && mLevelTimer >= 0)
+		mTimerLabel->setString(cocos2d::__String::createWithFormat("%d", (int) mLevelTimer)->_string);
+	
+	if (mLevelTimer <= 0)
+	{
+		//TODO: save result
+		//TODO: show result
+		
+		cocos2d::Director::getInstance()->popScene();
+	}
 }
 
 void GameMode2LevelScene::updateSlow(float dt)

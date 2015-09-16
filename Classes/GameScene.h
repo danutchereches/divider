@@ -144,6 +144,9 @@ public:
 	static GameMode2LevelScene* create(int level);
 protected:
 	int mLevelNumber;
+	float mLevelTimer;
+	
+	cocos2d::Label* mTimerLabel;
 	
 	virtual void update(float dt) override;
 	virtual void updateSlow(float dt) override;
