@@ -685,6 +685,9 @@ bool GameMode2LevelScene::initWithLevelNumber(Level* level)
 	
 	mNumbers = (int*) malloc(mNumbersSize * sizeof(int));
 	
+	if (!mNumbers)
+		return false;
+	
 	for (int i = 0; i < mLevel->getNrDivisible();)
 	{
 		int x = NUMBER_POOL[rand() % NUMBER_POOL_SIZE];
