@@ -19,6 +19,7 @@ LOCAL_SRC_FILES := main.cpp \
 					../../Classes/Loader.cpp \
 					../../Classes/LoadingScene.cpp \
 					../../Classes/IntroScene.cpp \
+					../../Classes/Level.cpp \
 					../../Classes/LevelSelectScene.cpp \
 					../../Classes/Ball.cpp \
 					../../Classes/Objects.cpp \

@@ -120,6 +120,11 @@ void GameScene::checkNumbers()
 	}
 }
 
+int GameScene::getNumber()
+{
+	return NUMBER_POOL[rand() % NUMBER_POOL_SIZE];
+}
+
 void GameScene::initPools()
 {
 	mBallPool.init(100, mGameLayer);
@@ -324,7 +329,7 @@ void GameMode1Scene::spawnBall()
 {
 	Ball* ball = mBallPool.obtainPoolItem();
 	ball->setPosition(rand() % (int) mScreenSize.width , rand() % (int) mScreenSize.height);
-	ball->setNumber(NUMBER_POOL[rand() % NUMBER_POOL_SIZE]);
+	ball->setNumber(getNumber());
 	ball->setColor(cocos2d::Color3B(55+rand() % 200, 55+rand() % 200, 55+rand() % 200));
 	ball->setVisible(true);
 	ball->setLocalZOrder(mBallZOrder--);
@@ -424,7 +429,7 @@ void GameMode2Scene::spawnBall()
 {
 	Ball* ball = mBallPool.obtainPoolItem();
 	ball->setPosition(rand() % (int) mGameLayer->getContentSize().width, -mGameLayer->getPositionY());
-	ball->setNumber(NUMBER_POOL[rand() % NUMBER_POOL_SIZE]);
+	ball->setNumber(getNumber());
 	ball->setColor(cocos2d::Color3B(55+rand() % 200, 55+rand() % 200, 55+rand() % 200));
 	ball->setVisible(true);
 	ball->setLocalZOrder(mBallZOrder--);
@@ -649,7 +654,7 @@ GameScene* GameMode2InfiniteScene::clone() const
 	return GameMode2InfiniteScene::create();
 }
 
-GameMode2LevelScene* GameMode2LevelScene::create(int level)
+GameMode2LevelScene* GameMode2LevelScene::create(Level* level)
 {
 	GameMode2LevelScene* scene = new (std::nothrow) GameMode2LevelScene();
 	
@@ -666,34 +671,38 @@ GameMode2LevelScene* GameMode2LevelScene::create(int level)
 	}
 }
 
-bool GameMode2LevelScene::initWithLevelNumber(int level)
+bool GameMode2LevelScene::initWithLevelNumber(Level* level)
 {
 	if (!GameMode2Scene::init())
 		return false;
 	
-	mLevelNumber = level;
-	mLevelTimer = 20;
+	mLevel = level;
+	mLevelTimer = 40;
 	
-	switch (mLevelNumber)
+	mCurrentDivisor = mLevel->getDivisor();
+	mNumbersSize = mLevel->getNrDivisible() + mLevel->getNrIndivisible();
+	mNumbersIndex = 0;
+	
+	mNumbers = (int*) malloc(mNumbersSize * sizeof(int));
+	
+	for (int i = 0; i < mLevel->getNrDivisible();)
 	{
-		case 1:
-			mBallSpeed = 8.0f;
-			mSpawnInterval = 0.5f;
-			mCurrentDivisor = 2;
-			break;
-		case 2:
-			mBallSpeed = 9.0f;
-			mSpawnInterval = 0.45f;
-			mCurrentDivisor = 5;
-			break;
-		case 3:
-			mBallSpeed = 10.0f;
-			mSpawnInterval = 0.4f;
-			mCurrentDivisor = 3;
-			break;
-		default:
-			return false;
+		int x = NUMBER_POOL[rand() % NUMBER_POOL_SIZE];
+		if (x % mCurrentDivisor == 0)
+			mNumbers[i++] = x;
 	}
+	
+	for (int i = 0; i < mLevel->getNrIndivisible();)
+	{
+		int x = NUMBER_POOL[rand() % NUMBER_POOL_SIZE];
+		if (x % mCurrentDivisor != 0)
+			mNumbers[mLevel->getNrDivisible() + i++] = x;
+	}
+	
+	helpers::Number::shuffle(mNumbers, mNumbersSize);
+	
+	mBallSpeed = mLevel->getSpeed();
+	mSpawnInterval = (mLevelTimer-5) / mNumbersSize;
 	
 	mTimerLabel = cocos2d::Label::createWithTTF("", "fonts/default.ttf", 10);
 	mTimerLabel->setPosition(cocos2d::Vec2(mUILayer->getContentSize().width - 2, mUILayer->getContentSize().height - 2));
@@ -705,8 +714,19 @@ bool GameMode2LevelScene::initWithLevelNumber(int level)
 	return true;
 }
 
+int GameMode2LevelScene::getNumber()
+{
+	if (mNumbersIndex < mNumbersSize)
+		return mNumbers[mNumbersIndex++];
+	
+	return -1;
+}
+
 void GameMode2LevelScene::update(float dt)
 {
+	if (mNumbersIndex >= mNumbersSize)
+		mSpawnTimer -= mSpawnInterval; //stall
+	
 	GameMode2Scene::update(dt);
 	
 	int oldTimer = mLevelTimer;
@@ -752,5 +772,5 @@ void GameMode2LevelScene::missBall(Ball* ball, bool manual)
 
 GameScene* GameMode2LevelScene::clone() const
 {
-	return GameMode2LevelScene::create(mLevelNumber);
+	return GameMode2LevelScene::create(mLevel);
 }

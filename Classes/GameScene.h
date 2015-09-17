@@ -6,6 +6,7 @@
 #include "Loader.h"
 #include "Ball.h"
 #include "Objects.h"
+#include "Level.h"
 #include "AppDelegate.h"
 
 class GameScene : public cocos2d::Scene
@@ -43,6 +44,7 @@ protected:
 	bool mIsGameServicesAvailable;
 	
 	void checkNumbers();
+	virtual int getNumber();
 	void initPools();
 	
 	virtual void update(float dt);
@@ -136,17 +138,22 @@ protected:
 class GameMode2LevelScene : public GameMode2Scene
 {
 public:
-	virtual bool initWithLevelNumber(int level);
-	inline int getLevelNumber() { return mLevelNumber; }
+	virtual bool initWithLevelNumber(Level* level);
 	
 	GameScene* clone() const override;
 	
-	static GameMode2LevelScene* create(int level);
+	static GameMode2LevelScene* create(Level* level);
 protected:
-	int mLevelNumber;
+	int* mNumbers;
+	int mNumbersSize;
+	int mNumbersIndex;
+	
+	Level* mLevel;
 	float mLevelTimer;
 	
 	cocos2d::Label* mTimerLabel;
+	
+	virtual int getNumber() override;
 	
 	virtual void update(float dt) override;
 	virtual void updateSlow(float dt) override;

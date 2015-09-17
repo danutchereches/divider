@@ -124,6 +124,7 @@ set(GAME_SRC
   Classes/Loader.cpp
   Classes/LoadingScene.cpp
   Classes/IntroScene.cpp
+  Classes/Level.cpp
   Classes/LevelSelectScene.cpp
   Classes/Ball.cpp
   Classes/Objects.cpp
@@ -138,6 +139,7 @@ set(GAME_HEADERS
   Classes/Loader.h
   Classes/LoadingScene.h
   Classes/IntroScene.h
+  Classes/Level.h
   Classes/LevelSelectScene.h
   Classes/Objects.h
   Classes/Ball.h

@@ -121,5 +121,37 @@ const std::string Locale::getCountry()
 	return country;
 }
 
+const std::string String::format(const char* format, ...)
+{
+	std::string _string;
+	int maxLength = 1024*100;
+	va_list ap;
+	va_start(ap, format);
+	char* pBuf = (char*)malloc(maxLength);
+	if (pBuf != nullptr)
+	{
+		vsnprintf(pBuf, maxLength, format, ap);
+		_string = pBuf;
+		free(pBuf);
+	}
+	va_end(ap);
+	
+	return _string;
+}
+
+void Number::shuffle(int* array, const int size)
+{
+	int n = size-1, a, b;
+	
+	for (int i = 0; i < size-1; i++)
+	{
+		a = rand() % n;
+		b = array[n];
+		array[n] = array[a];
+		array[a] = b;
+		n--;
+	}
+}
+
 }; // namespace helpers {
 

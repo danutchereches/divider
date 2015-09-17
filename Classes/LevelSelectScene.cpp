@@ -1,5 +1,20 @@
 #include "LevelSelectScene.h"
 
+Level LevelSelectScene::LEVELS[] = {
+		Level(2, 8.0f, 20, 30), // level 1
+		Level(5, 8.5f, 20, 30), // level 2
+		Level(3, 8.7f, 20, 30), // level 3
+		Level(4, 9.0f, 20, 30), // level 4
+		Level(6, 9.5f, 20, 30), // level 5
+		Level(3, 10.0f, 20, 40), // level 6
+		Level(4, 11.0f, 20, 30), // level 7
+		Level(8, 12.0f, 20, 30), // level 8
+		Level(9, 13.0f, 20, 30), // level 9
+		Level(7, 14.0f, 20, 30), // level 10
+		Level(6, 15.0f, 20, 60), // level 11
+		Level(7, 16.0f, 20, 50)  // level 12
+};
+
 LevelSelectScene::LevelSelectScene()
 {
 	cocos2d::log("level select scene constructed");
@@ -32,11 +47,16 @@ bool LevelSelectScene::init()
 	cocos2d::MenuItem* menuItem;
 	float width = (mVisibleSize.width - 20)/3;
 	float height = (mVisibleSize.height - 40) / 4;
-	for (int x = 0; x < 3; x++)
+	int n = sizeof(LEVELS)/sizeof(Level);
+	
+	for (int y = 0; y < 4; y++)
 	{
-		for (int y = 0; y < 4; y++)
+		for (int x = 0; x < 3; x++)
 		{
-			int levelNr = x * 4 + y + 1;
+			int levelNr = y * 3 + x;
+			
+			if (levelNr >= n)
+				break;
 			
 			menuItem = cocos2d::MenuItem::create();
 			menuItem->setPosition(cocos2d::Vec2(10 + width * x, mVisibleSize.height - 20 - y * height));
@@ -44,21 +64,21 @@ bool LevelSelectScene::init()
 			menuItem->setAnchorPoint(cocos2d::Vec2::ANCHOR_TOP_LEFT);
 			menu->addChild(menuItem);
 			
-			cocos2d::Label* label = cocos2d::Label::createWithTTF(cocos2d::__String::createWithFormat("level %d", levelNr)->_string, "fonts/default.ttf", 6);
+			cocos2d::Label* label = cocos2d::Label::createWithTTF(helpers::String::format("level %d", levelNr+1), "fonts/default.ttf", 6);
 			label->setPosition(width/2, height * 0.65f);
 			menuItem->addChild(label);
 			
 			for (int i = 0; i < 3; i++)
 			{
-				cocos2d::Sprite* star = cocos2d::Sprite::createWithSpriteFrameName("star_w");
+				cocos2d::Sprite* star = cocos2d::Sprite::createWithSpriteFrameName("star_b"); //TODO: show real score
 				star->setPosition(width / 4 * (i+1), 8);
 				menuItem->addChild(star);
 			}
 			
-			if (levelNr <= 1)
+			if (true) //TODO: read level progress
 			{
 				menuItem->setCallback([levelNr] (cocos2d::Ref* btn) {
-					cocos2d::Director::getInstance()->pushScene(GameMode2LevelScene::create(levelNr));
+					cocos2d::Director::getInstance()->pushScene(GameMode2LevelScene::create(&LEVELS[levelNr]));
 				});
 			}
 			else

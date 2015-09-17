@@ -2,7 +2,7 @@
 
 #include "cocos2d.h"
 #include "GameScene.h"
-#include "LevelSelectScene.h"
+#include "Level.h"
 #include "Helpers.h"
 
 class LevelSelectScene : public cocos2d::Scene {
@@ -13,6 +13,8 @@ public:
 	virtual bool init() override;
 	
 	CREATE_FUNC(LevelSelectScene);
+	
+	static Level LEVELS[];
 private:
 	cocos2d::Size mScreenSize;
 	cocos2d::Size mVisibleSize;

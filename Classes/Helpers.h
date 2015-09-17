@@ -27,5 +27,17 @@ public:
 	static const std::string getCountry();
 };
 
+class String
+{
+public:
+	static const std::string format(const char* format, ...);
+};
+
+class Number
+{
+public:
+	static void shuffle(int* array, const int size);
+};
+
 }; // namespace helpers {
 #endif // __HELPERS_H__
