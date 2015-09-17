@@ -428,7 +428,7 @@ void GameMode2Scene::updateDivisor(int d)
 void GameMode2Scene::spawnBall()
 {
 	Ball* ball = mBallPool.obtainPoolItem();
-	ball->setPosition(rand() % (int) mGameLayer->getContentSize().width, -mGameLayer->getPositionY());
+	ball->setPosition(ball->getContentSize().width/2 + rand() % (int) (mGameLayer->getContentSize().width - ball->getContentSize().width), -mGameLayer->getPositionY());
 	ball->setNumber(getNumber());
 	ball->setColor(cocos2d::Color3B(55+rand() % 200, 55+rand() % 200, 55+rand() % 200));
 	ball->setVisible(true);
