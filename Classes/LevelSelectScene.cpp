@@ -1,18 +1,18 @@
 #include "LevelSelectScene.h"
 
 Level LevelSelectScene::LEVELS[] = {
-		Level(2, 8.0f, 20, 30), // level 1
-		Level(5, 8.5f, 20, 30), // level 2
-		Level(3, 8.7f, 20, 30), // level 3
-		Level(4, 9.0f, 20, 30), // level 4
-		Level(6, 9.5f, 20, 30), // level 5
-		Level(3, 10.0f, 20, 40), // level 6
-		Level(4, 11.0f, 20, 30), // level 7
-		Level(8, 12.0f, 20, 30), // level 8
-		Level(9, 13.0f, 20, 30), // level 9
-		Level(7, 14.0f, 20, 30), // level 10
-		Level(6, 15.0f, 20, 60), // level 11
-		Level(7, 16.0f, 20, 50)  // level 12
+		Level(101, 2, 8.0f, 20, 30), // level 1
+		Level(102, 5, 8.5f, 20, 30), // level 2
+		Level(103, 3, 8.7f, 20, 30), // level 3
+		Level(104, 4, 9.0f, 20, 30), // level 4
+		Level(105, 6, 9.5f, 20, 30), // level 5
+		Level(106, 3, 10.0f, 20, 40), // level 6
+		Level(107, 4, 11.0f, 20, 30), // level 7
+		Level(108, 8, 12.0f, 20, 30), // level 8
+		Level(109, 9, 13.0f, 20, 30), // level 9
+		Level(110, 7, 14.0f, 20, 30), // level 10
+		Level(111, 6, 15.0f, 20, 60), // level 11
+		Level(112, 7, 16.0f, 20, 50)  // level 12
 };
 
 LevelSelectScene::LevelSelectScene()
@@ -37,12 +37,12 @@ bool LevelSelectScene::init()
 	cocos2d::LayerColor* bg = cocos2d::LayerColor::create(cocos2d::Color4B(0, 0, 30, 255));
 	this->addChild(bg);
 	
-	auto menu = cocos2d::Menu::create();
-	menu->ignoreAnchorPointForPosition(false);
-	menu->setPosition(cocos2d::Vec2(mOrigin.x, mOrigin.y));
-	menu->setAnchorPoint(cocos2d::Vec2::ZERO);
-	menu->setContentSize(cocos2d::Size(mVisibleSize.width, mVisibleSize.height));
-	this->addChild(menu);
+	mMenu = cocos2d::Menu::create();
+	mMenu->ignoreAnchorPointForPosition(false);
+	mMenu->setPosition(cocos2d::Vec2(mOrigin.x, mOrigin.y));
+	mMenu->setAnchorPoint(cocos2d::Vec2::ZERO);
+	mMenu->setContentSize(cocos2d::Size(mVisibleSize.width, mVisibleSize.height));
+	this->addChild(mMenu);
 	
 	cocos2d::MenuItem* menuItem;
 	float width = (mVisibleSize.width - 20)/3;
@@ -62,7 +62,8 @@ bool LevelSelectScene::init()
 			menuItem->setPosition(cocos2d::Vec2(10 + width * x, mVisibleSize.height - 20 - y * height));
 			menuItem->setContentSize(cocos2d::Size(width, height));
 			menuItem->setAnchorPoint(cocos2d::Vec2::ANCHOR_TOP_LEFT);
-			menu->addChild(menuItem);
+			menuItem->setTag(LEVELS[levelNr].getId());
+			mMenu->addChild(menuItem);
 			
 			cocos2d::Label* label = cocos2d::Label::createWithTTF(helpers::String::format("level %d", levelNr+1), "fonts/default.ttf", 6);
 			label->setPosition(width/2, height * 0.65f);
@@ -70,8 +71,9 @@ bool LevelSelectScene::init()
 			
 			for (int i = 0; i < 3; i++)
 			{
-				cocos2d::Sprite* star = cocos2d::Sprite::createWithSpriteFrameName("star_b"); //TODO: show real score
+				cocos2d::Sprite* star = cocos2d::Sprite::createWithSpriteFrameName("star_b");
 				star->setPosition(width / 4 * (i+1), 8);
+				star->setTag(i+1);
 				menuItem->addChild(star);
 			}
 			
@@ -96,6 +98,42 @@ bool LevelSelectScene::init()
 	dispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 	
 	return true;
+}
+
+void LevelSelectScene::onEnter()
+{
+	cocos2d::Scene::onEnter();
+	
+	cocos2d::Node* menuItem;
+	cocos2d::Sprite* star;
+	cocos2d::SpriteFrame* starW = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName("star_w");
+	int n = sizeof(LEVELS)/sizeof(Level);
+	
+	for (int i = 0; i < n; i++)
+	{
+		menuItem = mMenu->getChildByTag(LEVELS[i].getId());
+		
+		if (!menuItem)
+			continue;
+		
+		if (LEVELS[i].getScore() >= LEVELS[i].getNrDivisible() * 0.5f)
+		{
+			star = dynamic_cast<cocos2d::Sprite*>(menuItem->getChildByTag(1));
+			star->setSpriteFrame(starW);
+		}
+		
+		if (LEVELS[i].getScore() >= LEVELS[i].getNrDivisible() * 0.75f)
+		{
+			star = dynamic_cast<cocos2d::Sprite*>(menuItem->getChildByTag(2));
+			star->setSpriteFrame(starW);
+		}
+		
+		if (LEVELS[i].getScore() >= LEVELS[i].getNrDivisible())
+		{
+			star = dynamic_cast<cocos2d::Sprite*>(menuItem->getChildByTag(3));
+			star->setSpriteFrame(starW);
+		}
+	}
 }
 
 void LevelSelectScene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event)

@@ -14,11 +14,31 @@ int Level::getProgress()
 	return l;
 }
 
-Level::Level(int d, int s, int nrd, int nrid)
+Level::Level(int id, int d, int s, int nrd, int nrid)
 {
-	mNumber = 0;
+	mId = id;
 	mDivisor = d;
 	mSpeed = s;
 	mNrDivisible = nrd;
 	mNrIndivisible = nrid;
+	mScore = -1;
+}
+
+const int Level::getScore()
+{
+	if (mScore == -1)
+		mScore = cocos2d::UserDefault::getInstance()->getIntegerForKey(helpers::String::format("score_%d", mId).c_str(), 0);
+	
+	return mScore;
+}
+
+void Level::setScore(const int score, bool save/* = true */)
+{
+	if (score <= getScore())
+		return;
+	
+	if (save)
+		cocos2d::UserDefault::getInstance()->setIntegerForKey(helpers::String::format("score_%d", mId).c_str(), score);
+	
+	mScore = score;
 }

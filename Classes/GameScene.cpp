@@ -739,7 +739,7 @@ void GameMode2LevelScene::update(float dt)
 	
 	if (mLevelTimer <= 0)
 	{
-		//TODO: save result
+		mLevel->setScore(mScore);
 		//TODO: show result
 		
 		cocos2d::Director::getInstance()->popScene();
@@ -764,6 +764,8 @@ void GameMode2LevelScene::missBall(Ball* ball, bool manual)
 {
 	if (manual)
 	{
+		mLevel->setScore(mScore);
+		
 		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("die.wav");
 		cocos2d::Director::getInstance()->replaceScene(clone());
 	}

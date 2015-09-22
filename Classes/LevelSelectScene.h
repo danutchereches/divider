@@ -11,6 +11,7 @@ public:
 	~LevelSelectScene();
 	
 	virtual bool init() override;
+	virtual void onEnter() override;
 	
 	CREATE_FUNC(LevelSelectScene);
 	
@@ -19,6 +20,8 @@ private:
 	cocos2d::Size mScreenSize;
 	cocos2d::Size mVisibleSize;
 	cocos2d::Vec2 mOrigin;
+	
+	cocos2d::Menu* mMenu;
 	
 	void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
 	void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
