@@ -292,6 +292,14 @@ bool GameMode1Scene::init()
 	
 	updateDivisor(6);
 	
+	if (AppDelegate::pluginAnalytics != nullptr)
+	{
+		cocos2d::plugin::LogEventParamMap params;
+		params.insert(cocos2d::plugin::LogEventParamPair("&iv", "game_mode_1"));
+		params.insert(cocos2d::plugin::LogEventParamPair("&utl", "started"));
+		AppDelegate::pluginAnalytics->logEvent("started", &params);
+	}
+	
 	return true;
 }
 
@@ -473,6 +481,13 @@ bool GameMode2InfiniteScene::init()
 	
 	setDivisorRange();
 	
+	if (AppDelegate::pluginAnalytics != nullptr)
+	{
+		cocos2d::plugin::LogEventParamMap params;
+		params.insert(cocos2d::plugin::LogEventParamPair("&ec", "game_mode_2"));
+		params.insert(cocos2d::plugin::LogEventParamPair("&el", "started"));
+		AppDelegate::pluginAnalytics->logEvent("started", &params);
+	}
 	return true;
 }
 
@@ -714,6 +729,14 @@ bool GameMode2LevelScene::initWithLevelNumber(Level* level)
 	
 	updateDivisor(mCurrentDivisor);
 	
+	if (AppDelegate::pluginAnalytics != nullptr)
+	{
+		cocos2d::plugin::LogEventParamMap params;
+		params.insert(cocos2d::plugin::LogEventParamPair("&ec", helpers::String::format("game_mode_3_level_%d", mLevel->getId())));
+		params.insert(cocos2d::plugin::LogEventParamPair("&el", "started"));
+		AppDelegate::pluginAnalytics->logEvent("started", &params);
+	}
+	
 	return true;
 }
 
@@ -743,6 +766,14 @@ void GameMode2LevelScene::update(float dt)
 		//TODO: show result
 		
 		cocos2d::Director::getInstance()->popScene();
+		
+		if (AppDelegate::pluginAnalytics != nullptr)
+		{
+			cocos2d::plugin::LogEventParamMap params;
+			params.insert(cocos2d::plugin::LogEventParamPair("&ec", helpers::String::format("game_mode_3_level_%d", mLevel->getId())));
+			params.insert(cocos2d::plugin::LogEventParamPair("&el", "finished"));
+			AppDelegate::pluginAnalytics->logEvent(helpers::String::format("scored_%d", mScore).c_str(), &params);
+		}
 	}
 }
 
@@ -768,6 +799,14 @@ void GameMode2LevelScene::missBall(Ball* ball, bool manual)
 		
 		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("die.wav");
 		cocos2d::Director::getInstance()->replaceScene(clone());
+		
+		if (AppDelegate::pluginAnalytics != nullptr)
+		{
+			cocos2d::plugin::LogEventParamMap params;
+			params.insert(cocos2d::plugin::LogEventParamPair("&ec", helpers::String::format("game_mode_3_level_%d", mLevel->getId())));
+			params.insert(cocos2d::plugin::LogEventParamPair("&el", "died"));
+			AppDelegate::pluginAnalytics->logEvent(helpers::String::format("scored_%d", mScore).c_str(), &params);
+		}
 	}
 	else
 	{

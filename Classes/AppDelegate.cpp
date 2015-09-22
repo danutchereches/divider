@@ -86,7 +86,7 @@ bool AppDelegate::applicationDidFinishLaunching()
 	pluginAnalytics = dynamic_cast<cocos2d::plugin::ProtocolAnalytics*>
 			(cocos2d::plugin::PluginManager::getInstance()->loadPlugin("GoogleAnalytics"));
 	pluginAnalytics->setDebugMode(true);
-	pluginAnalytics->startSession("UA-999-999");
+	pluginAnalytics->startSession("UA-3393187-14");
 	pluginAnalytics->setCaptureUncaughtException(true);
 	pluginAnalytics->setSessionContinueMillis(300);
 	
