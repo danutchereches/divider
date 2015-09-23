@@ -692,7 +692,7 @@ bool GameMode2LevelScene::initWithLevelNumber(Level* level)
 		return false;
 	
 	mLevel = level;
-	mLevelTimer = 40;
+	mLevelTimer = 60;
 	
 	mCurrentDivisor = mLevel->getDivisor();
 	mNumbersSize = mLevel->getNrDivisible() + mLevel->getNrIndivisible();
@@ -720,7 +720,7 @@ bool GameMode2LevelScene::initWithLevelNumber(Level* level)
 	helpers::Number::shuffle(mNumbers, mNumbersSize);
 	
 	mBallSpeed = mLevel->getSpeed();
-	mSpawnInterval = (mLevelTimer-5) / mNumbersSize;
+	mSpawnInterval = (mLevelTimer-10) / mNumbersSize;
 	
 	mTimerLabel = cocos2d::Label::createWithTTF("", "fonts/default.ttf", 10);
 	mTimerLabel->setPosition(cocos2d::Vec2(mUILayer->getContentSize().width - 2, mUILayer->getContentSize().height - 2));

@@ -1,18 +1,22 @@
 #include "LevelSelectScene.h"
 
-Level LevelSelectScene::LEVELS[] = {
-		Level(101, 2, 8.0f, 20, 30), // level 1
-		Level(102, 5, 8.5f, 20, 30), // level 2
-		Level(103, 3, 8.7f, 20, 30), // level 3
-		Level(104, 4, 9.0f, 20, 30), // level 4
-		Level(105, 6, 9.5f, 20, 30), // level 5
-		Level(106, 3, 10.0f, 20, 40), // level 6
-		Level(107, 4, 11.0f, 20, 30), // level 7
-		Level(108, 8, 12.0f, 20, 30), // level 8
-		Level(109, 9, 13.0f, 20, 30), // level 9
+Level LevelSelectScene::LEVELS[] =
+{
+		Level(101, 2, 10.0f, 20, 30), // level 1
+		Level(102, 5, 10.0f, 20, 30), // level 2
+		Level(103, 3, 10.0f, 20, 40), // level 3
+		Level(104, 4, 11.0f, 20, 30), // level 4
+		Level(105, 6, 12.0f, 20, 40), // level 5
+		Level(106, 3, 13.0f, 20, 50), // level 6
+		Level(107, 5, 20.0f, 20, 60), // level 7
+		Level(108, 8, 15.0f, 20, 30), // level 8
+		Level(109, 9, 14.0f, 20, 30), // level 9
 		Level(110, 7, 14.0f, 20, 30), // level 10
-		Level(111, 6, 15.0f, 20, 60), // level 11
-		Level(112, 7, 16.0f, 20, 50)  // level 12
+		Level(111, 6, 16.0f, 20, 60), // level 11
+		Level(112, 4, 17.0f, 20, 50), // level 12
+		Level(113, 7, 15.0f, 20, 50), // level 13
+		Level(114, 9, 14.5f, 20, 50), // level 14
+		Level(115, 7, 17.0f, 20, 80)  // level 15
 };
 
 LevelSelectScene::LevelSelectScene()
@@ -45,11 +49,11 @@ bool LevelSelectScene::init()
 	this->addChild(mMenu);
 	
 	cocos2d::MenuItem* menuItem;
-	float width = (mVisibleSize.width - 20)/3;
-	float height = (mVisibleSize.height - 40) / 4;
+	float width = (mVisibleSize.width - 20) / 3;
+	float height = (mVisibleSize.height - 40) / 5;
 	int n = sizeof(LEVELS)/sizeof(Level);
 	
-	for (int y = 0; y < 4; y++)
+	for (int y = 0; y < 5; y++)
 	{
 		for (int x = 0; x < 3; x++)
 		{
