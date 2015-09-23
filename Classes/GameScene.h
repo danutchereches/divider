@@ -17,6 +17,9 @@ public:
 	static int NUMBER_POOL_SIZE;
 	static int NUMBER_POOL[];
 	static int DIVISORS[];
+	static const std::string ANALYTICS_GAME_MODE_INDEX;
+	static const std::string ANALYTICS_LEVEL_INDEX;
+	static const std::string ANALYTICS_SCORE_INDEX;
 	
 	virtual GameScene* clone() const = 0;
 protected:

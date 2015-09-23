@@ -91,6 +91,13 @@ bool LevelSelectScene::init()
 	listener->onKeyReleased = CC_CALLBACK_2(LevelSelectScene::onKeyReleased, this);
 	dispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 	
+	if (AppDelegate::pluginAnalytics != nullptr)
+	{
+		cocos2d::plugin::LogEventParamMap params;
+		params.insert(cocos2d::plugin::LogEventParamPair(GameScene::ANALYTICS_GAME_MODE_INDEX, "mode_3"));
+		AppDelegate::pluginAnalytics->logPageView("level_select", &params);
+	}
+	
 	return true;
 }
 

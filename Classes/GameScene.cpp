@@ -3,6 +3,9 @@
 int GameScene::NUMBER_POOL_SIZE = 21;
 int GameScene::NUMBER_POOL[] = {10, 12, 14, 15, 18, 20, 21, 25, 27, 28, 32, 35, 36, 42, 45, 48, 50, 54, 56, 64, 68};
 int GameScene::DIVISORS[] = {2, 5, 3, 4, 6, 7, 8, 9};
+const std::string GameScene::ANALYTICS_GAME_MODE_INDEX = "dimension_1";
+const std::string GameScene::ANALYTICS_LEVEL_INDEX = "dimension_2";
+const std::string GameScene::ANALYTICS_SCORE_INDEX = "metric_1";
 
 bool GameScene::init()
 {
@@ -77,13 +80,6 @@ bool GameScene::init()
 	
 	this->schedule(schedule_selector(GameScene::update));
 	this->schedule(schedule_selector(GameScene::updateSlow), 1.0f);
-	
-	if (AppDelegate::pluginAnalytics != nullptr)
-	{
-		std::vector<cocos2d::plugin::PluginParam*> params;
-		params.push_back(new cocos2d::plugin::PluginParam("game"));
-		AppDelegate::pluginAnalytics->callFuncWithParam("logPageView", params);
-	}
 	
 	return true;
 }
@@ -295,9 +291,8 @@ bool GameMode1Scene::init()
 	if (AppDelegate::pluginAnalytics != nullptr)
 	{
 		cocos2d::plugin::LogEventParamMap params;
-		params.insert(cocos2d::plugin::LogEventParamPair("&iv", "game_mode_1"));
-		params.insert(cocos2d::plugin::LogEventParamPair("&utl", "started"));
-		AppDelegate::pluginAnalytics->logEvent("started", &params);
+		params.insert(cocos2d::plugin::LogEventParamPair(ANALYTICS_GAME_MODE_INDEX, "mode_1"));
+		AppDelegate::pluginAnalytics->logPageView("game", &params);
 	}
 	
 	return true;
@@ -484,10 +479,10 @@ bool GameMode2InfiniteScene::init()
 	if (AppDelegate::pluginAnalytics != nullptr)
 	{
 		cocos2d::plugin::LogEventParamMap params;
-		params.insert(cocos2d::plugin::LogEventParamPair("&ec", "game_mode_2"));
-		params.insert(cocos2d::plugin::LogEventParamPair("&el", "started"));
-		AppDelegate::pluginAnalytics->logEvent("started", &params);
+		params.insert(cocos2d::plugin::LogEventParamPair(ANALYTICS_GAME_MODE_INDEX, "mode_2"));
+		AppDelegate::pluginAnalytics->logPageView("game", &params);
 	}
+	
 	return true;
 }
 
@@ -732,9 +727,9 @@ bool GameMode2LevelScene::initWithLevelNumber(Level* level)
 	if (AppDelegate::pluginAnalytics != nullptr)
 	{
 		cocos2d::plugin::LogEventParamMap params;
-		params.insert(cocos2d::plugin::LogEventParamPair("&ec", helpers::String::format("game_mode_3_level_%d", mLevel->getId())));
-		params.insert(cocos2d::plugin::LogEventParamPair("&el", "started"));
-		AppDelegate::pluginAnalytics->logEvent("started", &params);
+		params.insert(cocos2d::plugin::LogEventParamPair(ANALYTICS_GAME_MODE_INDEX, "mode_3"));
+		params.insert(cocos2d::plugin::LogEventParamPair(ANALYTICS_LEVEL_INDEX, helpers::String::format("%d", mLevel->getId())));
+		AppDelegate::pluginAnalytics->logPageView("game", &params);
 	}
 	
 	return true;
@@ -770,9 +765,12 @@ void GameMode2LevelScene::update(float dt)
 		if (AppDelegate::pluginAnalytics != nullptr)
 		{
 			cocos2d::plugin::LogEventParamMap params;
-			params.insert(cocos2d::plugin::LogEventParamPair("&ec", helpers::String::format("game_mode_3_level_%d", mLevel->getId())));
-			params.insert(cocos2d::plugin::LogEventParamPair("&el", "finished"));
-			AppDelegate::pluginAnalytics->logEvent(helpers::String::format("scored_%d", mScore).c_str(), &params);
+			params.insert(cocos2d::plugin::LogEventParamPair(ANALYTICS_GAME_MODE_INDEX, "game_mode_3"));
+			params.insert(cocos2d::plugin::LogEventParamPair(ANALYTICS_LEVEL_INDEX, helpers::String::format("%d", mLevel->getId())));
+			params.insert(cocos2d::plugin::LogEventParamPair(ANALYTICS_SCORE_INDEX, helpers::String::format("%d", mScore)));
+			params.insert(cocos2d::plugin::LogEventParamPair("label", helpers::String::format("scored_%d", mScore)));
+			params.insert(cocos2d::plugin::LogEventParamPair("category", "finished"));
+			AppDelegate::pluginAnalytics->logEvent("finished_level", &params);
 		}
 	}
 }
@@ -803,9 +801,12 @@ void GameMode2LevelScene::missBall(Ball* ball, bool manual)
 		if (AppDelegate::pluginAnalytics != nullptr)
 		{
 			cocos2d::plugin::LogEventParamMap params;
-			params.insert(cocos2d::plugin::LogEventParamPair("&ec", helpers::String::format("game_mode_3_level_%d", mLevel->getId())));
-			params.insert(cocos2d::plugin::LogEventParamPair("&el", "died"));
-			AppDelegate::pluginAnalytics->logEvent(helpers::String::format("scored_%d", mScore).c_str(), &params);
+			params.insert(cocos2d::plugin::LogEventParamPair(ANALYTICS_GAME_MODE_INDEX, "game_mode_3"));
+			params.insert(cocos2d::plugin::LogEventParamPair(ANALYTICS_LEVEL_INDEX, helpers::String::format("%d", mLevel->getId())));
+			params.insert(cocos2d::plugin::LogEventParamPair(ANALYTICS_SCORE_INDEX, helpers::String::format("%d", mScore)));
+			params.insert(cocos2d::plugin::LogEventParamPair("label", helpers::String::format("scored_%d", mScore)));
+			params.insert(cocos2d::plugin::LogEventParamPair("category", "died"));
+			AppDelegate::pluginAnalytics->logEvent("finished_level", &params);
 		}
 	}
 	else

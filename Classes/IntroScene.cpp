@@ -69,6 +69,9 @@ bool IntroScene::init()
 	listener->onKeyReleased = CC_CALLBACK_2(IntroScene::onKeyReleased, this);
 	dispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 	
+	if (AppDelegate::pluginAnalytics != nullptr)
+		AppDelegate::pluginAnalytics->logPageView("intro");
+	
 	return true;
 }
 
