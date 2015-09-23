@@ -71,6 +71,7 @@ bool LevelSelectScene::init()
 			
 			cocos2d::Label* label = cocos2d::Label::createWithTTF(helpers::String::format("level %d", levelNr+1), "fonts/default.ttf", 6);
 			label->setPosition(width/2, height * 0.65f);
+			label->setTag(99999);
 			menuItem->addChild(label);
 			
 			for (int i = 0; i < 3; i++)
@@ -79,17 +80,6 @@ bool LevelSelectScene::init()
 				star->setPosition(width / 4 * (i+1), 8);
 				star->setTag(i+1);
 				menuItem->addChild(star);
-			}
-			
-			if (true) //TODO: read level progress
-			{
-				menuItem->setCallback([levelNr] (cocos2d::Ref* btn) {
-					cocos2d::Director::getInstance()->pushScene(GameMode2LevelScene::create(&LEVELS[levelNr]));
-				});
-			}
-			else
-			{
-				label->setColor(cocos2d::Color3B::GRAY);
 			}
 		}
 	}
@@ -108,23 +98,41 @@ void LevelSelectScene::onEnter()
 {
 	cocos2d::Scene::onEnter();
 	
-	cocos2d::Node* menuItem;
+	cocos2d::MenuItem* menuItem;
+	cocos2d::Node* label;
 	cocos2d::Sprite* star;
 	cocos2d::SpriteFrame* starW = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName("star_w");
 	int n = sizeof(LEVELS)/sizeof(Level);
+	bool unlock = true;
 	
 	for (int i = 0; i < n; i++)
 	{
-		menuItem = mMenu->getChildByTag(LEVELS[i].getId());
+		menuItem = dynamic_cast<cocos2d::MenuItem*>(mMenu->getChildByTag(LEVELS[i].getId()));
 		
 		if (!menuItem)
 			continue;
+		
+		label = menuItem->getChildByTag(99999);
+		if (unlock)
+		{
+			label->setColor(cocos2d::Color3B::WHITE);
+			menuItem->setCallback([i] (cocos2d::Ref* btn) {
+				cocos2d::Director::getInstance()->pushScene(GameMode2LevelScene::create(&LEVELS[i]));
+			});
+		}
+		else
+		{
+			label->setColor(cocos2d::Color3B::GRAY);
+		}
 		
 		if (LEVELS[i].getScore() >= LEVELS[i].getNrDivisible() * 0.5f)
 		{
 			star = dynamic_cast<cocos2d::Sprite*>(menuItem->getChildByTag(1));
 			star->setSpriteFrame(starW);
+			unlock = true;
 		}
+		else
+			unlock = false;
 		
 		if (LEVELS[i].getScore() >= LEVELS[i].getNrDivisible() * 0.75f)
 		{
