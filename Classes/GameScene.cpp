@@ -46,16 +46,6 @@ bool GameScene::init()
 	mScoreView->setAnchorPoint(cocos2d::Vec2(0, 1));
 	mUILayer->addChild(mScoreView);
 	
-	mBallZOrder = 999999;
-	mSpawnTimer = 0;
-	
-	mDivisorMin = 0;
-	mDivisorMax = sizeof(DIVISORS) / sizeof(int);
-	
-	mScore = 0;
-	updateScore();
-	
-	checkNumbers();
 	initPools();
 	
 	// Register Touch Event
@@ -78,8 +68,9 @@ bool GameScene::init()
 	auto listener4 = cocos2d::EventListenerCustom::create(EVENT_COME_TO_BACKGROUND, CC_CALLBACK_0(GameScene::onComeToBackground, this));
 	dispatcher->addEventListenerWithSceneGraphPriority(listener4, this);
 	
-	this->schedule(schedule_selector(GameScene::update));
-	this->schedule(schedule_selector(GameScene::updateSlow), 1.0f);
+	mSceneState = GAME_SCENE_STATES::NONE;
+	
+	startGame();
 	
 	return true;
 }
@@ -124,6 +115,130 @@ int GameScene::getNumber()
 void GameScene::initPools()
 {
 	mBallPool.init(100, mGameLayer);
+}
+
+void GameScene::restartGame()
+{
+	cocos2d::log("restart game");
+	
+	cocos2d::Director::getInstance()->replaceScene(clone());
+}
+
+void GameScene::startGame()
+{
+	if (mSceneState != GAME_SCENE_STATES::NONE
+	 && mSceneState != GAME_SCENE_STATES::OVER)
+	{
+		cocos2d::log("WARNING! Invalid scene state!");
+		return;
+	}
+	
+	cocos2d::log("start game");
+	mSceneState = GAME_SCENE_STATES::START;
+	
+	mBallZOrder = 999999;
+	mSpawnTimer = 0;
+	
+	mDivisorMin = 0;
+	mDivisorMax = sizeof(DIVISORS) / sizeof(int);
+	
+	mScore = 0;
+	updateScore();
+	
+	checkNumbers();
+	
+	resumeGame();
+}
+
+void GameScene::resumeGame()
+{
+	if (mSceneState != GAME_SCENE_STATES::START
+	 && mSceneState != GAME_SCENE_STATES::PAUSED)
+	{
+		cocos2d::log("WARNING! Invalid scene state!");
+		return;
+	}
+	
+	cocos2d::log("resume game");
+	mSceneState = GAME_SCENE_STATES::PLAY;
+	
+	for (auto it = mBalls.begin(); it != mBalls.end(); it++)
+		(*it)->resume();
+	
+	schedule(schedule_selector(GameScene::update));
+	schedule(schedule_selector(GameScene::updateSlow), 1.0f);
+}
+
+void GameScene::pauseGame()
+{
+	if (mSceneState != GAME_SCENE_STATES::PLAY)
+	{
+		cocos2d::log("WARNING! Invalid scene state!");
+		return;
+	}
+	
+	cocos2d::log("pause game");
+	mSceneState = GAME_SCENE_STATES::PAUSED;
+	
+	unschedule(schedule_selector(GameScene::update));
+	unschedule(schedule_selector(GameScene::updateSlow));
+	
+	for (auto it = mBalls.begin(); it != mBalls.end(); it++)
+		(*it)->pause();
+	
+	PauseOverlay* overlay = PauseOverlay::create();
+	overlay->resumeCallback = CC_CALLBACK_0(GameScene::resumeGame, this);
+	overlay->restartCallback = CC_CALLBACK_0(GameScene::startGame, this);
+	overlay->exitCallback = CC_CALLBACK_0(GameScene::exitGame, this);
+	addChild(overlay, 1000);
+}
+
+void GameScene::endGame(bool lost)
+{
+	if (mSceneState != GAME_SCENE_STATES::PLAY)
+	{
+		cocos2d::log("WARNING! Invalid scene state!");
+		return;
+	}
+	
+	cocos2d::log("end game");
+	mSceneState = GAME_SCENE_STATES::OVER;
+	
+	unschedule(schedule_selector(GameScene::update));
+	unschedule(schedule_selector(GameScene::updateSlow));
+	
+	for (auto it = mBalls.begin(); it != mBalls.end(); it++)
+		(*it)->pause();
+	
+	if (lost)
+	{
+		DieOverlay* overlay = DieOverlay::create();
+		overlay->restartCallback = CC_CALLBACK_0(GameScene::startGame, this);
+		overlay->exitCallback = CC_CALLBACK_0(GameScene::exitGame, this);
+		addChild(overlay, 1000);
+	}
+	else
+	{
+		FinishOverlay* overlay = FinishOverlay::create();
+		overlay->restartCallback = CC_CALLBACK_0(GameScene::startGame, this);
+		//overlay->nextLevelCallback = 
+		overlay->exitCallback = CC_CALLBACK_0(GameScene::exitGame, this);
+		addChild(overlay, 1000);
+	}
+}
+
+void GameScene::exitGame()
+{
+	if (mSceneState != GAME_SCENE_STATES::PAUSED
+	 && mSceneState != GAME_SCENE_STATES::OVER)
+	{
+		cocos2d::log("WARNING! Invalid scene state!");
+		return;
+	}
+	
+	cocos2d::log("exit game");
+	
+	cocos2d::Director::getInstance()->popScene();
 }
 
 void GameScene::update(float dt)
@@ -216,7 +331,7 @@ void GameScene::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::
 		if (AppDelegate::pluginAnalytics != nullptr)
 			AppDelegate::pluginAnalytics->logEvent("click_back_btn");
 		
-		cocos2d::Director::getInstance()->popScene();
+		pauseGame();
 	}
 	else if (keyCode == cocos2d::EventKeyboard::KeyCode::KEY_VOLUME_DOWN)
 	{
@@ -235,7 +350,8 @@ void GameScene::onComeToForeground()
 
 void GameScene::onComeToBackground()
 {
-	
+	if (mSceneState == GAME_SCENE_STATES::PLAY)
+		pauseGame();
 }
 
 bool GameMode1Scene::init()
@@ -358,7 +474,8 @@ void GameMode1Scene::missBall(Ball* ball)
 void GameMode1Scene::ballPopCallback(Ball* ball)
 {
 	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("die.wav");
-	cocos2d::Director::getInstance()->replaceScene(clone());
+	
+	endGame(true);
 }
 
 GameScene* GameMode1Scene::clone() const
@@ -656,7 +773,8 @@ void GameMode2InfiniteScene::divideBall(Ball* ball)
 void GameMode2InfiniteScene::missBall(Ball* ball, bool manual)
 {
 	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("die.wav");
-	cocos2d::Director::getInstance()->replaceScene(clone());
+	
+	endGame(true);
 }
 
 GameScene* GameMode2InfiniteScene::clone() const
@@ -735,6 +853,27 @@ bool GameMode2LevelScene::initWithLevelNumber(Level* level)
 	return true;
 }
 
+void GameMode2LevelScene::endGame(bool lost)
+{
+	GameMode2Scene::endGame(lost);
+	
+	if (AppDelegate::pluginAnalytics != nullptr)
+	{
+		cocos2d::plugin::LogEventParamMap params;
+		params.insert(cocos2d::plugin::LogEventParamPair(ANALYTICS_GAME_MODE_INDEX, "game_mode_3"));
+		params.insert(cocos2d::plugin::LogEventParamPair(ANALYTICS_LEVEL_INDEX, helpers::String::format("%d", mLevel->getId())));
+		params.insert(cocos2d::plugin::LogEventParamPair(ANALYTICS_SCORE_INDEX, helpers::String::format("%d", mScore)));
+		params.insert(cocos2d::plugin::LogEventParamPair("label", helpers::String::format("scored_%d", mScore)));
+		
+		if (lost)
+			params.insert(cocos2d::plugin::LogEventParamPair("category", "died"));
+		else
+			params.insert(cocos2d::plugin::LogEventParamPair("category", "finished"));
+		
+		AppDelegate::pluginAnalytics->logEvent("finished_level", &params);
+	}
+}
+
 int GameMode2LevelScene::getNumber()
 {
 	if (mNumbersIndex < mNumbersSize)
@@ -758,20 +897,8 @@ void GameMode2LevelScene::update(float dt)
 	if (mLevelTimer <= 0)
 	{
 		mLevel->setScore(mScore);
-		//TODO: show result
 		
-		cocos2d::Director::getInstance()->popScene();
-		
-		if (AppDelegate::pluginAnalytics != nullptr)
-		{
-			cocos2d::plugin::LogEventParamMap params;
-			params.insert(cocos2d::plugin::LogEventParamPair(ANALYTICS_GAME_MODE_INDEX, "game_mode_3"));
-			params.insert(cocos2d::plugin::LogEventParamPair(ANALYTICS_LEVEL_INDEX, helpers::String::format("%d", mLevel->getId())));
-			params.insert(cocos2d::plugin::LogEventParamPair(ANALYTICS_SCORE_INDEX, helpers::String::format("%d", mScore)));
-			params.insert(cocos2d::plugin::LogEventParamPair("label", helpers::String::format("scored_%d", mScore)));
-			params.insert(cocos2d::plugin::LogEventParamPair("category", "finished"));
-			AppDelegate::pluginAnalytics->logEvent("finished_level", &params);
-		}
+		endGame(false);
 	}
 }
 
@@ -796,18 +923,8 @@ void GameMode2LevelScene::missBall(Ball* ball, bool manual)
 		mLevel->setScore(mScore);
 		
 		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("die.wav");
-		cocos2d::Director::getInstance()->replaceScene(clone());
 		
-		if (AppDelegate::pluginAnalytics != nullptr)
-		{
-			cocos2d::plugin::LogEventParamMap params;
-			params.insert(cocos2d::plugin::LogEventParamPair(ANALYTICS_GAME_MODE_INDEX, "game_mode_3"));
-			params.insert(cocos2d::plugin::LogEventParamPair(ANALYTICS_LEVEL_INDEX, helpers::String::format("%d", mLevel->getId())));
-			params.insert(cocos2d::plugin::LogEventParamPair(ANALYTICS_SCORE_INDEX, helpers::String::format("%d", mScore)));
-			params.insert(cocos2d::plugin::LogEventParamPair("label", helpers::String::format("scored_%d", mScore)));
-			params.insert(cocos2d::plugin::LogEventParamPair("category", "died"));
-			AppDelegate::pluginAnalytics->logEvent("finished_level", &params);
-		}
+		endGame(true);
 	}
 	else
 	{

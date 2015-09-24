@@ -7,7 +7,16 @@
 #include "Ball.h"
 #include "Objects.h"
 #include "Level.h"
+#include "GameOverlay.h"
 #include "AppDelegate.h"
+
+enum class GAME_SCENE_STATES {
+	NONE,
+	START,
+	PLAY,
+	PAUSED,
+	OVER
+};
 
 class GameScene : public cocos2d::Scene
 {
@@ -22,6 +31,13 @@ public:
 	static const std::string ANALYTICS_SCORE_INDEX;
 	
 	virtual GameScene* clone() const = 0;
+	
+	virtual void restartGame();
+	virtual void startGame();
+	virtual void resumeGame();
+	virtual void pauseGame();
+	virtual void endGame(bool lost);
+	virtual void exitGame();
 protected:
 	cocos2d::Size mScreenSize;
 	cocos2d::Size mVisibleSize;
@@ -43,6 +59,8 @@ protected:
 	float mSpawnInterval;
 	
 	int mScore;
+	
+	GAME_SCENE_STATES mSceneState;
 	
 	bool mIsGameServicesAvailable;
 	
@@ -146,6 +164,8 @@ public:
 	GameScene* clone() const override;
 	
 	static GameMode2LevelScene* create(Level* level);
+	
+	virtual void endGame(bool lost) override;
 protected:
 	int* mNumbers;
 	int mNumbersSize;

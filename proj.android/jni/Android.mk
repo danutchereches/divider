@@ -23,6 +23,7 @@ LOCAL_SRC_FILES := main.cpp \
 					../../Classes/LevelSelectScene.cpp \
 					../../Classes/Ball.cpp \
 					../../Classes/Objects.cpp \
+					../../Classes/GameOverlay.cpp \
 					../../Classes/GameScene.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes

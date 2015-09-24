@@ -128,6 +128,7 @@ set(GAME_SRC
   Classes/LevelSelectScene.cpp
   Classes/Ball.cpp
   Classes/Objects.cpp
+  Classes/GameOverlay.cpp
   Classes/GameScene.cpp
   ${PLATFORM_SPECIFIC_SRC}
 )
@@ -143,6 +144,7 @@ set(GAME_HEADERS
   Classes/LevelSelectScene.h
   Classes/Objects.h
   Classes/Ball.h
+  Classes/GameOverlay.h
   Classes/GameScene.h
   ${PLATFORM_SPECIFIC_HEADERS}
 )
