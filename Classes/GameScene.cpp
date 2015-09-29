@@ -6,6 +6,7 @@ int GameScene::DIVISORS[] = {2, 5, 3, 4, 6, 7, 8, 9};
 const std::string GameScene::ANALYTICS_GAME_MODE_INDEX = "dimension_1";
 const std::string GameScene::ANALYTICS_LEVEL_INDEX = "dimension_2";
 const std::string GameScene::ANALYTICS_WAVE_INDEX = "dimension_3";
+const std::string GameScene::ANALYTICS_DIE_NUMBER_INDEX = "dimension_4";
 const std::string GameScene::ANALYTICS_SCORE_INDEX = "metric_1";
 
 bool GameScene::init()
@@ -429,6 +430,7 @@ void GameMode1Scene::endGame(int nr)
 		cocos2d::plugin::LogEventParamMap params;
 		params.insert(cocos2d::plugin::LogEventParamPair(ANALYTICS_GAME_MODE_INDEX, "game_mode_1"));
 		params.insert(cocos2d::plugin::LogEventParamPair(ANALYTICS_SCORE_INDEX, helpers::String::format("%d", mScore)));
+		params.insert(cocos2d::plugin::LogEventParamPair(ANALYTICS_DIE_NUMBER_INDEX, helpers::String::format("%d", nr)));
 		params.insert(cocos2d::plugin::LogEventParamPair("label", helpers::String::format("scored_%d", mScore)));
 		params.insert(cocos2d::plugin::LogEventParamPair("category", "died"));
 		
@@ -629,6 +631,7 @@ void GameMode2InfiniteScene::endGame(int nr)
 		params.insert(cocos2d::plugin::LogEventParamPair(ANALYTICS_GAME_MODE_INDEX, "game_mode_2"));
 		params.insert(cocos2d::plugin::LogEventParamPair(ANALYTICS_WAVE_INDEX, helpers::String::format("%d", mWaveNumber)));
 		params.insert(cocos2d::plugin::LogEventParamPair(ANALYTICS_SCORE_INDEX, helpers::String::format("%d", mScore)));
+		params.insert(cocos2d::plugin::LogEventParamPair(ANALYTICS_DIE_NUMBER_INDEX, helpers::String::format("%d", nr)));
 		params.insert(cocos2d::plugin::LogEventParamPair("label", helpers::String::format("scored_%d", mScore)));
 		params.insert(cocos2d::plugin::LogEventParamPair("category", "died"));
 		
@@ -929,7 +932,10 @@ void GameMode2LevelScene::endGame(int nr)
 		params.insert(cocos2d::plugin::LogEventParamPair("label", helpers::String::format("scored_%d", mScore)));
 		
 		if (nr)
+		{
+			params.insert(cocos2d::plugin::LogEventParamPair(ANALYTICS_DIE_NUMBER_INDEX, helpers::String::format("%d", nr)));
 			params.insert(cocos2d::plugin::LogEventParamPair("category", "died"));
+		}
 		else
 			params.insert(cocos2d::plugin::LogEventParamPair("category", "finished"));
 		

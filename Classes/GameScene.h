@@ -29,6 +29,7 @@ public:
 	static const std::string ANALYTICS_GAME_MODE_INDEX;
 	static const std::string ANALYTICS_LEVEL_INDEX;
 	static const std::string ANALYTICS_WAVE_INDEX;
+	static const std::string ANALYTICS_DIE_NUMBER_INDEX;
 	static const std::string ANALYTICS_SCORE_INDEX;
 	
 	virtual GameScene* clone() const = 0;
