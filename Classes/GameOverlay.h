@@ -32,8 +32,8 @@ protected:
 class DieOverlay : public GameOverlay
 {
 public:
-	static DieOverlay* create(int nr);
-	virtual bool init(int nr);
+	static DieOverlay* create(int nr, int score = -1);
+	virtual bool init(int nr, int score);
 	
 	std::function<void(void)> restartCallback;
 	std::function<void(void)> exitCallback;

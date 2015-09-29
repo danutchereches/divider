@@ -149,11 +149,11 @@ void PauseOverlay::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2
 		GameOverlay::onKeyReleased(keyCode, event);
 	}
 }
-DieOverlay* DieOverlay::create(int nr)
+DieOverlay* DieOverlay::create(int nr, int score/* = 0*/)
 {
 	DieOverlay* overlay = new (std::nothrow) DieOverlay();
 	
-	if (overlay && overlay->init(nr))
+	if (overlay && overlay->init(nr, score))
 	{
 		overlay->autorelease();
 		return overlay;
@@ -166,28 +166,24 @@ DieOverlay* DieOverlay::create(int nr)
 	}
 }
 
-bool DieOverlay::init(int nr)
+bool DieOverlay::init(int nr, int score)
 {
 	if (!GameOverlay::init())
 		return false;
+	
+	cocos2d::Label* title = cocos2d::Label::createWithTTF("GAME OVER", "fonts/semibold.otf", 10);
+	title->setPosition(getContentSize().width/2, getContentSize().height * 0.80f);
+	addChild(title);
 	
 	std::string message;
 	
 	if (nr > 0)
 	{
-		cocos2d::Label* title = cocos2d::Label::createWithTTF("BIG MISTAKE", "fonts/semibold.otf", 10);
-		title->setPosition(getContentSize().width/2, getContentSize().height * 0.82f);
-		addChild(title);
-		
-		cocos2d::Label* subtitle = cocos2d::Label::createWithTTF("THE LAST ONE!", "fonts/semibold.otf", 10);
-		subtitle->setPosition(getContentSize().width/2, getContentSize().height * 0.75f);
-		addChild(subtitle);
-		
 		int length = 0, divisors[100], nrDiv = 0;
 		char* buf = (char*) malloc(100);
 		if (buf != nullptr)
 		{
-			length += sprintf(buf, "%d is only divisible by", nr);
+			length += sprintf(buf, "%d is divisible by", nr);
 			
 			for (int i = 2; i < nr && i < 100; i++)
 				if (nr % i == 0)
@@ -207,10 +203,6 @@ bool DieOverlay::init(int nr)
 	}
 	else
 	{
-		cocos2d::Label* title = cocos2d::Label::createWithTTF("TOUGH BREAK", "fonts/semibold.otf", 10);
-		title->setPosition(getContentSize().width/2, getContentSize().height * 0.80f);
-		addChild(title);
-		
 		message = "Try harder.\nDivide more numbers to pass the level.";
 	}
 	
@@ -218,6 +210,15 @@ bool DieOverlay::init(int nr)
 	text->setLineSpacing(2.0f);
 	text->setPosition(getContentSize().width/2, getContentSize().height * 0.50f);
 	addChild(text);
+	
+	if (score >= 0)
+	{
+		cocos2d::Label* scoreLevel = cocos2d::Label::createWithTTF(helpers::String::format("SCORE: %d", score), "fonts/semibold.otf", 7);
+		scoreLevel->setPosition(getContentSize().width/2, getContentSize().height * 0.40f);
+		addChild(scoreLevel);
+		
+		text->setPositionY(getContentSize().height * 0.6f);
+	}
 	
 	cocos2d::MenuItemSprite* restart = cocos2d::MenuItemSprite::create(cocos2d::Sprite::createWithSpriteFrameName("retry_btn"),
 			nullptr, [this] (cocos2d::Ref* node) { if (restartCallback) restartCallback(); removeFromParentAndCleanup(true); });
@@ -276,22 +277,19 @@ bool FinishOverlay::init(int score, int level, int stars)
 	title->setPosition(getContentSize().width/2, getContentSize().height * 0.85f);
 	addChild(title);
 	
-	if (level)
+	cocos2d::Sprite* levelBg = cocos2d::Sprite::createWithSpriteFrameName("level_win_bg");
+	levelBg->setPosition(getContentSize().width * 0.5f, getContentSize().height * 0.7f);
+	addChild(levelBg);
+	
+	cocos2d::Label* levelLabel = cocos2d::Label::createWithTTF(helpers::String::format("%d", level), "fonts/semibold.otf", 14);
+	levelLabel->setPosition(getContentSize().width * 0.5f, getContentSize().height * 0.7f);
+	addChild(levelLabel);
+	
+	for (int i = 0; i < 3; i++)
 	{
-		cocos2d::Sprite* levelBg = cocos2d::Sprite::createWithSpriteFrameName("level_win_bg");
-		levelBg->setPosition(getContentSize().width * 0.5f, getContentSize().height * 0.7f);
-		addChild(levelBg);
-		
-		cocos2d::Label* levelLabel = cocos2d::Label::createWithTTF(helpers::String::format("%d", level), "fonts/semibold.otf", 14);
-		levelLabel->setPosition(getContentSize().width * 0.5f, getContentSize().height * 0.7f);
-		addChild(levelLabel);
-		
-		for (int i = 0; i < 3; i++)
-		{
-			cocos2d::Sprite* star = cocos2d::Sprite::createWithSpriteFrameName(stars > i ? "big_star_w" : "big_star_b");
-			star->setPosition(levelBg->getPositionX() - 13 + 13 * i, levelBg->getPositionY() - (i == 1 ? 22 : 19));
-			addChild(star);
-		}
+		cocos2d::Sprite* star = cocos2d::Sprite::createWithSpriteFrameName(stars > i ? "big_star_w" : "big_star_b");
+		star->setPosition(levelBg->getPositionX() - 13 + 13 * i, levelBg->getPositionY() - (i == 1 ? 22 : 19));
+		addChild(star);
 	}
 	
 	cocos2d::Label* scoreLevel = cocos2d::Label::createWithTTF(helpers::String::format("SCORE: %d", score), "fonts/semibold.otf", 7);
