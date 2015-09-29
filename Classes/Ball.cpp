@@ -1,12 +1,15 @@
 #include "Ball.h"
 
+std::string Ball::SKINS[] = {"number_bg_1", "number_bg_2", "number_bg_3", "number_bg_4", "number_bg_5", "number_bg_6", "number_bg_7"};
+int Ball::SKINS_NR = 7;
+
 bool Ball::init()
 {
-	if (!cocos2d::Sprite::initWithSpriteFrameName("ball"))
+	if (!cocos2d::Sprite::initWithSpriteFrameName(SKINS[rand()%SKINS_NR]))
 		return false;
 	
 	mNumber = 0;
-	mLabel = cocos2d::Label::createWithTTF("0", "fonts/default.ttf", 8);
+	mLabel = cocos2d::Label::createWithTTF("0", "fonts/semibold.otf", 6);
 	mLabel->setPosition(getContentSize().width/2, getContentSize().height/2);
 	this->addChild(mLabel);
 	

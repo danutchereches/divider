@@ -18,6 +18,8 @@ protected:
 	int mNumber;
 	cocos2d::Label* mLabel;
 	
+	static std::string SKINS[];
+	static int SKINS_NR;
 private:
 	
 };

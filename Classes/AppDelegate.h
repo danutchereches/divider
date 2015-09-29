@@ -9,7 +9,7 @@
 #include "PluginManager.h"
 #include "LanguageManager.h"
 #include "Helpers.h"
-#include "LoadingScene.h"
+#include "IntroScene.h"
 
 /**
  @brief    The cocos2d Application.

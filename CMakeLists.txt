@@ -122,7 +122,6 @@ set(GAME_SRC
   Classes/LanguageManager.cpp
   Classes/AppDelegate.cpp
   Classes/Loader.cpp
-  Classes/LoadingScene.cpp
   Classes/IntroScene.cpp
   Classes/Level.cpp
   Classes/LevelSelectScene.cpp
@@ -138,7 +137,6 @@ set(GAME_HEADERS
   Classes/LanguageManager.h
   Classes/AppDelegate.h
   Classes/Loader.h
-  Classes/LoadingScene.h
   Classes/IntroScene.h
   Classes/Level.h
   Classes/LevelSelectScene.h

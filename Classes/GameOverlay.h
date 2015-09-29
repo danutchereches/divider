@@ -5,9 +5,10 @@
 class GameOverlay : public cocos2d::LayerColor
 {
 public:
-	CREATE_FUNC(GameOverlay);
 	virtual bool init() override;
 protected:
+	cocos2d::Menu* mMenu;
+	
 	virtual bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
 	virtual void onTouchMoved(cocos2d::Touch* touch, cocos2d::Event* event);
 	virtual void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event);
@@ -31,8 +32,8 @@ protected:
 class DieOverlay : public GameOverlay
 {
 public:
-	CREATE_FUNC(DieOverlay);
-	virtual bool init() override;
+	static DieOverlay* create(int nr);
+	virtual bool init(int nr);
 	
 	std::function<void(void)> restartCallback;
 	std::function<void(void)> exitCallback;
@@ -43,8 +44,8 @@ protected:
 class FinishOverlay : public GameOverlay
 {
 public:
-	CREATE_FUNC(FinishOverlay);
-	virtual bool init() override;
+	static FinishOverlay* create(int score, int level = -1, int stars = -1);
+	virtual bool init(int level, int score, int stars);
 	
 	std::function<void(void)> restartCallback;
 	std::function<void(void)> nextLevelCallback;

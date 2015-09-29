@@ -28,6 +28,7 @@ public:
 	static int DIVISORS[];
 	static const std::string ANALYTICS_GAME_MODE_INDEX;
 	static const std::string ANALYTICS_LEVEL_INDEX;
+	static const std::string ANALYTICS_WAVE_INDEX;
 	static const std::string ANALYTICS_SCORE_INDEX;
 	
 	virtual GameScene* clone() const = 0;
@@ -36,7 +37,7 @@ public:
 	virtual void startGame();
 	virtual void resumeGame();
 	virtual void pauseGame();
-	virtual void endGame(bool lost);
+	virtual void endGame(int nr);
 	virtual void exitGame();
 protected:
 	cocos2d::Size mScreenSize;
@@ -46,6 +47,7 @@ protected:
 	cocos2d::Node* mGameLayer;
 	cocos2d::Layer* mUILayer;
 	
+	cocos2d::LayerColor* mTopBar;
 	cocos2d::Label* mScoreView;
 	
 	BallPool mBallPool;
@@ -94,6 +96,8 @@ public:
 	GameScene* clone() const override;
 	
 	CREATE_FUNC(GameMode1Scene);
+	
+	virtual void endGame(int nr) override;
 protected:
 	void updateDivisor(int d) override;
 	void spawnBall() override;
@@ -132,6 +136,8 @@ public:
 	GameScene* clone() const override;
 	
 	CREATE_FUNC(GameMode2InfiniteScene);
+	
+	virtual void endGame(int nr) override;
 protected:
 	
 	int mWaveNumber;
@@ -165,7 +171,7 @@ public:
 	
 	static GameMode2LevelScene* create(Level* level);
 	
-	virtual void endGame(bool lost) override;
+	virtual void endGame(int nr) override;
 protected:
 	int* mNumbers;
 	int mNumbersSize;

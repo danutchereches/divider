@@ -37,6 +37,8 @@ void AppDelegate::initGLContextAttrs()
 
 bool AppDelegate::applicationDidFinishLaunching()
 {
+	srand ((unsigned)time(nullptr));
+	
 	// initialize director
 	auto director = cocos2d::Director::getInstance();
 	auto glview = director->getOpenGLView();
@@ -121,7 +123,7 @@ bool AppDelegate::applicationDidFinishLaunching()
 	showAds = !ud->getBoolForKey("remove_ads", false);
 	
 	// create a scene. it's an autorelease object
-	auto scene = LoadingScene::create();
+	auto scene = IntroScene::create();
 	
 	// run
 	director->runWithScene(scene);

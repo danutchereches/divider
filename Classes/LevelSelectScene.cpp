@@ -19,7 +19,7 @@ Level LevelSelectScene::LEVELS[] =
 		Level(115, 7, 17.0f, 20, 80)  // level 15
 };
 
-LevelSelectScene::LevelSelectScene()
+LevelSelectScene::LevelSelectScene() : mMenu(nullptr)
 {
 	cocos2d::log("level select scene constructed");
 }
@@ -38,8 +38,20 @@ bool LevelSelectScene::init()
 	mVisibleSize = cocos2d::Director::getInstance()->getVisibleSize();
 	mOrigin = cocos2d::Director::getInstance()->getVisibleOrigin();
 	
-	cocos2d::LayerColor* bg = cocos2d::LayerColor::create(cocos2d::Color4B(0, 0, 30, 255));
-	this->addChild(bg);
+	cocos2d::Texture2D::TexParams texParams;
+	texParams.magFilter = GL_LINEAR;
+	texParams.minFilter = GL_LINEAR;
+	texParams.wrapS = GL_REPEAT;
+	texParams.wrapT = GL_REPEAT;
+	
+	cocos2d::Sprite* bg = cocos2d::Sprite::create("bg.png", cocos2d::Rect(mOrigin.x, mOrigin.y, mVisibleSize.width, mVisibleSize.height));
+	bg->getTexture()->setTexParameters(texParams);
+	bg->setPosition(cocos2d::Vec2(mOrigin.x + mVisibleSize.width/2, mOrigin.y + mVisibleSize.height/2));
+	addChild(bg);
+	
+	auto logo = cocos2d::Sprite::createWithSpriteFrameName("levels_title");
+	logo->setPosition(cocos2d::Vec2(mOrigin.x + mVisibleSize.width/2, mOrigin.y + mVisibleSize.height * 0.92f));
+	this->addChild(logo);
 	
 	mMenu = cocos2d::Menu::create();
 	mMenu->ignoreAnchorPointForPosition(false);
@@ -48,10 +60,19 @@ bool LevelSelectScene::init()
 	mMenu->setContentSize(cocos2d::Size(mVisibleSize.width, mVisibleSize.height));
 	this->addChild(mMenu);
 	
+	cocos2d::MenuItem* exitBtn = cocos2d::MenuItemSprite::create(cocos2d::Sprite::createWithSpriteFrameName("back_btn"),
+			nullptr, [] (cocos2d::Ref* btn) {
+		cocos2d::Director::getInstance()->popScene();
+	});
+	exitBtn->setPosition(9, 9);
+	mMenu->addChild(exitBtn);
+	
 	cocos2d::MenuItem* menuItem;
 	float width = (mVisibleSize.width - 20) / 3;
 	float height = (mVisibleSize.height - 40) / 5;
 	int n = sizeof(LEVELS)/sizeof(Level);
+	//cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName("bitmap_font");
+	//cocos2d::log("rect %f %f", frame->getOriginalSize().width, frame->getOriginalSizeInPixels().height);
 	
 	for (int y = 0; y < 5; y++)
 	{
@@ -63,21 +84,39 @@ bool LevelSelectScene::init()
 				break;
 			
 			menuItem = cocos2d::MenuItem::create();
-			menuItem->setPosition(cocos2d::Vec2(10 + width * x, mVisibleSize.height - 20 - y * height));
+			menuItem->setPosition(cocos2d::Vec2(10 + width * x, mVisibleSize.height - 25 - y * height));
 			menuItem->setContentSize(cocos2d::Size(width, height));
 			menuItem->setAnchorPoint(cocos2d::Vec2::ANCHOR_TOP_LEFT);
 			menuItem->setTag(LEVELS[levelNr].getId());
 			mMenu->addChild(menuItem);
 			
-			cocos2d::Label* label = cocos2d::Label::createWithTTF(helpers::String::format("level %d", levelNr+1), "fonts/default.ttf", 6);
-			label->setPosition(width/2, height * 0.65f);
-			label->setTag(99999);
-			menuItem->addChild(label);
+			cocos2d::Sprite* btnBg = cocos2d::Sprite::createWithSpriteFrameName("level_btn");
+			btnBg->setPosition(width/2, height * 0.60f);
+			btnBg->setTag(99999);
+			menuItem->addChild(btnBg);
+			
+			cocos2d::Label* label = cocos2d::Label::createWithTTF(helpers::String::format("%d", levelNr+1), "fonts/semibold.otf", 6);
+			//label->enableShadow(cocos2d::Color4B::BLACK, cocos2d::Size(0.0f, -0.5f));
+			label->setPosition(btnBg->getContentSize().width/2, btnBg->getContentSize().height*0.5f);
+			/*
+			cocos2d::Label* label = cocos2d::Label::createWithCharMap(frame->getTexture(),
+					frame->getOriginalSizeInPixels().width/10, frame->getOriginalSizeInPixels().height, '0');
+			label->setString(helpers::String::format("%d", levelNr+1));
+			label->setPosition(btnBg->getContentSize().width/2, btnBg->getContentSize().height*0.5f);
+			*//*
+			cocos2d::LayerColor* lc = cocos2d::LayerColor::create(cocos2d::Color4B::RED);
+			lc->ignoreAnchorPointForPosition(false);
+			lc->setPosition(btnBg->getContentSize().width/2, btnBg->getContentSize().height/2);
+			lc->setAnchorPoint(cocos2d::Vec2::ANCHOR_MIDDLE);
+			lc->setContentSize(label->getContentSize());
+			btnBg->addChild(lc);
+			*/
+			btnBg->addChild(label);
 			
 			for (int i = 0; i < 3; i++)
 			{
 				cocos2d::Sprite* star = cocos2d::Sprite::createWithSpriteFrameName("star_b");
-				star->setPosition(width / 4 * (i+1), 8);
+				star->setPosition(width / 4 * (i+1), i == 1 ? 5 : 6);
 				star->setTag(i+1);
 				menuItem->addChild(star);
 			}

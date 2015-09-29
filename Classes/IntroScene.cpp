@@ -19,49 +19,81 @@ bool IntroScene::init()
 	mVisibleSize = cocos2d::Director::getInstance()->getVisibleSize();
 	mOrigin = cocos2d::Director::getInstance()->getVisibleOrigin();
 	
-	cocos2d::LayerColor* bg = cocos2d::LayerColor::create(cocos2d::Color4B(0, 0, 30, 255));
-	this->addChild(bg);
+	cocos2d::Texture2D::TexParams texParams;
+	texParams.magFilter = GL_LINEAR;
+	texParams.minFilter = GL_LINEAR;
+	texParams.wrapS = GL_REPEAT;
+	texParams.wrapT = GL_REPEAT;
 	
-	auto logo = cocos2d::Label::createWithTTF("DIVIDER", "fonts/default.ttf", 22);
-	logo->setColor(cocos2d::Color3B(120, 211, 73));
-	logo->setPosition(mScreenSize.width/2, mScreenSize.height * 0.9f);
+	cocos2d::Sprite* bg = cocos2d::Sprite::create("bg.png", cocos2d::Rect(mOrigin.x, mOrigin.y, mVisibleSize.width, mVisibleSize.height));
+	bg->getTexture()->setTexParameters(texParams);
+	bg->setPosition(cocos2d::Vec2(mOrigin.x + mVisibleSize.width/2, mOrigin.y + mVisibleSize.height/2));
+	addChild(bg);
+	
+	auto logo = cocos2d::Sprite::create("logo.png");
+	logo->setPosition(cocos2d::Vec2(mOrigin.x + mVisibleSize.width/2, mOrigin.y + mVisibleSize.height * 0.8f));
 	this->addChild(logo);
+	
+	auto loading = cocos2d::Label::createWithTTF("Loading .. ", "fonts/semibold.otf", 6);
+	loading->setColor(cocos2d::Color3B::WHITE);
+	loading->setPosition(cocos2d::Vec2(mOrigin.x + mVisibleSize.width/2, mOrigin.y + mVisibleSize.height * 0.45f));
+	loading->setTag(13);
+	this->addChild(loading);
+	
+	schedule(schedule_selector(IntroScene::load), 0);
+	
+	return true;
+}
+
+void IntroScene::load(float dt)
+{
+	Loader::loadEverything();
+	
+	unschedule(schedule_selector(IntroScene::load));
+	
+	this->removeChildByTag(13);
 	
 	auto menu = cocos2d::Menu::create();
 	menu->ignoreAnchorPointForPosition(false);
 	menu->setPosition(cocos2d::Vec2(mOrigin.x, mOrigin.y));
 	menu->setAnchorPoint(cocos2d::Vec2::ZERO);
 	menu->setContentSize(cocos2d::Size(mVisibleSize.width, mVisibleSize.height));
-	this->addChild(menu);
+	this->addChild(menu, 2);
 	
-	auto mode1Btn = cocos2d::MenuItemLabel::create(cocos2d::Label::createWithTTF("mode 1", "fonts/default.ttf", 12),
+	auto mode1Btn = cocos2d::MenuItemLabel::create(cocos2d::Label::createWithTTF("?", "fonts/default.otf", 6),
 			[] (cocos2d::Ref* btn) {
 		cocos2d::Director::getInstance()->pushScene(GameMode1Scene::create());
 	});
-	mode1Btn->setPosition(cocos2d::Vec2(mVisibleSize.width/2, mVisibleSize.height * 0.65f));
+	mode1Btn->setAnchorPoint(cocos2d::Vec2(0, 1));
+	mode1Btn->setPosition(2, mVisibleSize.height - 2);
 	menu->addChild(mode1Btn);
 	
-	auto mode2Btn = cocos2d::MenuItemLabel::create(cocos2d::Label::createWithTTF("mode 2", "fonts/default.ttf", 12),
+	auto mode2Btn = cocos2d::MenuItemLabel::create(cocos2d::Label::createWithTTF("?", "fonts/default.otf", 6),
 			[] (cocos2d::Ref* btn) {
 		cocos2d::Director::getInstance()->pushScene(GameMode2InfiniteScene::create());
 	});
-	mode2Btn->setPosition(cocos2d::Vec2(mVisibleSize.width/2, mVisibleSize.height * 0.5f));
+	mode2Btn->setAnchorPoint(cocos2d::Vec2(1, 1));
+	mode2Btn->setPosition(mVisibleSize.width - 2, mVisibleSize.height - 2);
 	menu->addChild(mode2Btn);
 	
-	auto mode3Btn = cocos2d::MenuItemLabel::create(cocos2d::Label::createWithTTF("mode 3", "fonts/default.ttf", 12),
-			[] (cocos2d::Ref* btn) {
+	cocos2d::Sprite* btnBg = cocos2d::Sprite::createWithSpriteFrameName("big_play_bg");
+	btnBg->setPosition(mOrigin.x + mVisibleSize.width * 0.5f, mOrigin.y + mVisibleSize.height * 0.4f);
+	this->addChild(btnBg, 1);
+	
+	auto mode3Btn = cocos2d::MenuItemSprite::create(cocos2d::Sprite::createWithSpriteFrameName("big_play_btn"),
+			nullptr, [] (cocos2d::Ref* btn) {
 		cocos2d::Director::getInstance()->pushScene(LevelSelectScene::create());
 	});
-	mode3Btn->setPosition(cocos2d::Vec2(mVisibleSize.width/2, mVisibleSize.height * 0.35f));
+	mode3Btn->setPosition(mVisibleSize.width * 0.5f, mVisibleSize.height * 0.4f);
 	menu->addChild(mode3Btn);
-	
-	auto exitBtn = cocos2d::MenuItemLabel::create(cocos2d::Label::createWithTTF("EXIT", "fonts/default.ttf", 10),
-			[] (cocos2d::Ref* btn) {
+	/*
+	auto exitBtn = cocos2d::MenuItemSprite::create(cocos2d::Sprite::createWithSpriteFrameName("back_btn"),
+			nullptr, [] (cocos2d::Ref* btn) {
 		AppDelegate::closeApp();
 	});
-	exitBtn->setPosition(cocos2d::Vec2(mVisibleSize.width/2, mVisibleSize.height * 0.15f));
+	exitBtn->setPosition(9, 9);
 	menu->addChild(exitBtn);
-	
+	*/
 	auto dispatcher = cocos2d::Director::getInstance()->getEventDispatcher();
 	
 	auto listener = cocos2d::EventListenerKeyboard::create();
@@ -71,8 +103,6 @@ bool IntroScene::init()
 	
 	if (AppDelegate::pluginAnalytics != nullptr)
 		AppDelegate::pluginAnalytics->logPageView("intro");
-	
-	return true;
 }
 
 void IntroScene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event)
