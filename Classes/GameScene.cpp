@@ -520,6 +520,7 @@ bool GameMode2Scene::init()
 	mTopBar->addChild(mCurrentDivisorLabel);
 	
 	mCurrentDivisor = -1;
+	mLastBallSpawnX = -1;
 	
 	return true;
 }
@@ -540,7 +541,7 @@ void GameMode2Scene::updateSlow(float dt)
 		while (!mBalls.empty())
 		{
 			Ball* ball = mBalls.front();
-			if (ball->getPositionY() > -mGameLayer->getPositionY() + mScreenSize.height)
+			if (ball->getPositionY() > -mGameLayer->getPositionY() + mScreenSize.height + ball->getContentSize().height/2)
 			{
 				mBallPool.recyclePoolItem(ball);
 				mBalls.eraseObject(ball);
@@ -563,11 +564,30 @@ void GameMode2Scene::updateDivisor(int d)
 void GameMode2Scene::spawnBall()
 {
 	Ball* ball = mBallPool.obtainPoolItem();
-	ball->setPosition(ball->getContentSize().width/2 + rand() % (int) (mGameLayer->getContentSize().width - ball->getContentSize().width), -mGameLayer->getPositionY());
 	ball->setNumber(getNumber());
 	ball->setVisible(true);
 	ball->setLocalZOrder(mBallZOrder--);
 	mBalls.pushBack(ball);
+	
+	float posX = -1, posX_;
+	float posY = -mGameLayer->getPositionY() - ball->getContentSize().height/2;
+	int tries = 0;
+	get_pos:
+	posX_ = ball->getContentSize().width/2 + rand() % (int) (mGameLayer->getContentSize().width - ball->getContentSize().width);
+	if (posX < 0)
+		posX = posX_;
+	if (mLastBallSpawnX >= 0 && std::abs(mLastBallSpawnX - posX) < 30)
+	{
+		if (std::abs(mLastBallSpawnX - posX) < std::abs(mLastBallSpawnX - posX_))
+			posX = posX_;
+		
+		tries++;
+		if (tries < 5)
+			goto get_pos;
+	}
+	
+	mLastBallSpawnX = posX;
+	ball->setPosition(posX, posY);
 }
 
 void GameMode2Scene::divideBall(Ball* ball)

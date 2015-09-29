@@ -116,6 +116,7 @@ public:
 protected:
 	
 	float mBallSpeed; // pixels per second
+	float mLastBallSpawnX;
 	
 	cocos2d::Label* mCurrentDivisorLabel;
 	
