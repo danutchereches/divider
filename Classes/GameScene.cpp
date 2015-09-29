@@ -587,12 +587,12 @@ bool GameMode2InfiniteScene::init()
 	if (!GameMode2Scene::init())
 		return false;
 	
-	mPreviousDivisorLabel = cocos2d::Label::createWithTTF("", "fonts/default.otf", 7);
-	mPreviousDivisorLabel->setPosition(mTopBar->getContentSize().width * 0.2f, mTopBar->getContentSize().height/2);
-	mTopBar->addChild(mPreviousDivisorLabel);
+//	mPreviousDivisorLabel = cocos2d::Label::createWithTTF("", "fonts/default.otf", 6);
+//	mPreviousDivisorLabel->setPosition(mTopBar->getContentSize().width * 0.3f, mTopBar->getContentSize().height/2);
+//	mTopBar->addChild(mPreviousDivisorLabel);
 	
-	mNextDivisorLabel = cocos2d::Label::createWithTTF("", "fonts/default.otf", 7);
-	mNextDivisorLabel->setPosition(mTopBar->getContentSize().width * 0.8f, mTopBar->getContentSize().height/2);
+	mNextDivisorLabel = cocos2d::Label::createWithTTF("", "fonts/default.otf", 5);
+	mNextDivisorLabel->setPosition(mTopBar->getContentSize().width * 0.68f, mTopBar->getContentSize().height/2);
 	mNextDivisorLabel->setVisible(false);
 	mTopBar->addChild(mNextDivisorLabel);
 	
@@ -759,7 +759,10 @@ void GameMode2InfiniteScene::endWave()
 	
 	mNextDivisor = d;
 	mNextDivisorLabel->setVisible(true);
-	mNextDivisorLabel->setString(cocos2d::__String::createWithFormat("%d", d)->_string);
+	mNextDivisorLabel->setOpacity(0);
+	mNextDivisorLabel->setString(cocos2d::__String::createWithFormat("Next: %d", d)->_string);
+	mNextDivisorLabel->runAction(cocos2d::RepeatForever::create(cocos2d::Sequence::create(
+			cocos2d::FadeIn::create(1.0f), cocos2d::FadeOut::create(0.5f), nullptr)));
 	
 	cocos2d::log("selected divisor %d", d);
 }
@@ -805,9 +808,10 @@ void GameMode2InfiniteScene::updateDivisor(int d)
 	
 	mPreviousDivisor = mCurrentDivisor;
 	
-	if (mPreviousDivisor > 0)
-		mPreviousDivisorLabel->setString(cocos2d::__String::createWithFormat("%d", mPreviousDivisor)->_string);
+//	if (mPreviousDivisor > 0)
+//		mPreviousDivisorLabel->setString(cocos2d::__String::createWithFormat("%d", mPreviousDivisor)->_string);
 	mNextDivisorLabel->setVisible(false);
+	mNextDivisorLabel->stopAllActions();
 	
 	GameMode2Scene::updateDivisor(d);
 }
