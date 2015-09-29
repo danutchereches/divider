@@ -420,7 +420,7 @@ void GameMode1Scene::endGame(int nr)
 	GameScene::endGame(nr);
 	
 	FinishOverlay* overlay = FinishOverlay::create(mScore);
-	overlay->restartCallback = CC_CALLBACK_0(GameScene::startGame, this);
+	overlay->restartCallback = CC_CALLBACK_0(GameScene::restartGame, this);
 	//overlay->nextLevelCallback = 
 	overlay->exitCallback = CC_CALLBACK_0(GameScene::exitGame, this);
 	addChild(overlay, 1000);
@@ -632,7 +632,7 @@ void GameMode2InfiniteScene::endGame(int nr)
 	GameMode2Scene::endGame(nr);
 	
 	FinishOverlay* overlay = FinishOverlay::create(mScore);
-	overlay->restartCallback = CC_CALLBACK_0(GameScene::startGame, this);
+	overlay->restartCallback = CC_CALLBACK_0(GameScene::restartGame, this);
 	//overlay->nextLevelCallback = 
 	overlay->exitCallback = CC_CALLBACK_0(GameScene::exitGame, this);
 	addChild(overlay, 1000);
