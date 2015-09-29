@@ -1025,8 +1025,6 @@ void GameMode2LevelScene::missBall(Ball* ball, bool manual)
 {
 	if (manual)
 	{
-		mLevel->setScore(mScore);
-		
 		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("die.wav");
 		
 		endGame(ball->getNumber());
