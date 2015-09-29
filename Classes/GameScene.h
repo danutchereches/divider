@@ -148,6 +148,7 @@ protected:
 	int mPreviousDivisor;
 	int mNextDivisor;
 	
+	cocos2d::Label* mWaveLabel;
 	cocos2d::Label* mPreviousDivisorLabel;
 	cocos2d::Label* mNextDivisorLabel;
 	

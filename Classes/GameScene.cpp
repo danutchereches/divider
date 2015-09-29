@@ -603,6 +603,18 @@ bool GameMode2InfiniteScene::init()
 	mCurrentDivisor = -1;
 	mNextDivisor = -1;
 	
+	cocos2d::Label* waveTitle = cocos2d::Label::createWithTTF("WAVE", "fonts/default.otf", 5);
+	waveTitle->setPosition(cocos2d::Vec2(12, mUILayer->getContentSize().height - 1));
+	waveTitle->setAnchorPoint(cocos2d::Vec2(0.5f, 1));
+	mUILayer->addChild(waveTitle);
+	
+	mWaveLabel = cocos2d::Label::createWithTTF("", "fonts/default.otf", 9);
+	mWaveLabel->setPosition(cocos2d::Vec2(
+			waveTitle->getPosition().x - waveTitle->getContentSize().width * waveTitle->getAnchorPoint().x + waveTitle->getContentSize().width * 0.5f,
+			waveTitle->getPosition().y - waveTitle->getContentSize().height * waveTitle->getAnchorPoint().y - 1.0f));
+	mWaveLabel->setAnchorPoint(cocos2d::Vec2(0.5f, 1));
+	mUILayer->addChild(mWaveLabel);
+	
 	setDivisorRange();
 	
 	if (AppDelegate::pluginAnalytics != nullptr)
@@ -721,6 +733,8 @@ void GameMode2InfiniteScene::startWave()
 	
 	mNextDivisorLabel->setVisible(false);
 	updateDivisor(mNextDivisor);
+	
+	mWaveLabel->setString(cocos2d::__String::createWithFormat("%d", mWaveNumber)->_string);
 	
 	if (mWaveNumber > 1)
 	{
