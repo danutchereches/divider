@@ -57,10 +57,6 @@ bool GameScene::init()
 	mTopBar->setContentSize(cocos2d::Size(mUILayer->getContentSize().width, 15));
 	mUILayer->addChild(mTopBar);
 	
-	cocos2d::Sprite* divisorBg = cocos2d::Sprite::createWithSpriteFrameName("divisor_bg");
-	divisorBg->setPosition(mTopBar->getContentSize().width/2, mTopBar->getContentSize().height/2);
-	mTopBar->addChild(divisorBg);
-	
 	cocos2d::Label* scoreTitle = cocos2d::Label::createWithTTF("SCORE", "fonts/default.otf", 5);
 	scoreTitle->setPosition(cocos2d::Vec2(mUILayer->getContentSize().width - 12, mUILayer->getContentSize().height - 1));
 	scoreTitle->setAnchorPoint(cocos2d::Vec2(0.5f, 1));
@@ -513,6 +509,10 @@ bool GameMode2Scene::init()
 {
 	if (!GameScene::init())
 		return false;
+	
+	cocos2d::Sprite* divisorBg = cocos2d::Sprite::createWithSpriteFrameName("divisor_bg");
+	divisorBg->setPosition(mTopBar->getContentSize().width/2, mTopBar->getContentSize().height/2);
+	mTopBar->addChild(divisorBg);
 	
 	mCurrentDivisorLabel = cocos2d::Label::createWithTTF("", "fonts/semibold.otf", 8);
 	mCurrentDivisorLabel->setPosition(mTopBar->getContentSize().width * 0.5f, mTopBar->getContentSize().height * 0.52f);
