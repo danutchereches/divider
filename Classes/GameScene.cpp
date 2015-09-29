@@ -906,9 +906,9 @@ void GameMode2LevelScene::endGame(int nr)
 	}
 	else
 	{
-		int stars = mScore > mLevel->getNrDivisible() * 0.5f
-				? (mScore > mLevel->getNrDivisible() * 0.75f
-						? (mScore > mLevel->getNrDivisible() ? 3 : 2)
+		int stars = mScore >= mLevel->getNrDivisible() * 0.5f
+				? (mScore >= mLevel->getNrDivisible() * 0.75f
+						? (mScore >= mLevel->getNrDivisible() ? 3 : 2)
 						: 1
 				  )
 				: 0;
