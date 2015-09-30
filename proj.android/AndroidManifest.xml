@@ -6,7 +6,7 @@
 	android:versionName="0.1.1"
 	android:installLocation="auto">
 	<uses-sdk
-		android:minSdkVersion="13"
+		android:minSdkVersion="10"
 		android:targetSdkVersion="17" />
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.VIBRATE" />
