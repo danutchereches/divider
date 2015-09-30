@@ -31,6 +31,17 @@ public:
 	static const std::string ANALYTICS_WAVE_INDEX;
 	static const std::string ANALYTICS_DIE_NUMBER_INDEX;
 	static const std::string ANALYTICS_SCORE_INDEX;
+	static const std::string LEADERBOARD_ID;
+	static const std::string LEADERBOARD_MODE_1_ID;
+	static const std::string LEADERBOARD_MODE_2_ID;
+	static const std::string ACHIEVEMENT_FIRST_LEVEL;
+	static const std::string ACHIEVEMENT_ALL_LEVELS;
+	static const std::string ACHIEVEMENT_FIRST_3_STARS;
+	static const std::string ACHIEVEMENT_ALL_3_STARS;
+	static const std::string ACHIEVEMENT_PLAY_GAME_2;
+	static const std::string ACHIEVEMENT_1_WAVE;
+	static const std::string ACHIEVEMENT_10_WAVES;
+	static const std::string ACHIEVEMENT_50_WAVES;
 	
 	virtual GameScene* clone() const = 0;
 	
