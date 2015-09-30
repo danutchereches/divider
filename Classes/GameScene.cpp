@@ -9,6 +9,30 @@ const std::string GameScene::ANALYTICS_WAVE_INDEX = "dimension_3";
 const std::string GameScene::ANALYTICS_DIE_NUMBER_INDEX = "dimension_4";
 const std::string GameScene::ANALYTICS_SCORE_INDEX = "metric_1";
 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+const std::string GameScene::LEADERBOARD_MODE_1_ID = "CgkI9qH8t-UMEAIQCQ";
+const std::string GameScene::LEADERBOARD_MODE_2_ID = "CgkI9qH8t-UMEAIQCA";
+const std::string GameScene::ACHIEVEMENT_FIRST_LEVEL = "CgkI9qH8t-UMEAIQAQ";
+const std::string GameScene::ACHIEVEMENT_ALL_LEVELS = "CgkI9qH8t-UMEAIQAg";
+const std::string GameScene::ACHIEVEMENT_FIRST_3_STARS = "CgkI9qH8t-UMEAIQAw";
+const std::string GameScene::ACHIEVEMENT_ALL_3_STARS = "CgkI9qH8t-UMEAIQBA";
+const std::string GameScene::ACHIEVEMENT_PLAY_GAME_2 = "CgkI9qH8t-UMEAIQBQ";
+const std::string GameScene::ACHIEVEMENT_1_WAVE = "CgkI9qH8t-UMEAIQCg";
+const std::string GameScene::ACHIEVEMENT_10_WAVES = "CgkI9qH8t-UMEAIQBg";
+const std::string GameScene::ACHIEVEMENT_50_WAVES = "CgkI9qH8t-UMEAIQBw";
+#else
+const std::string GameScene::LEADERBOARD_MODE_1_ID = "-";
+const std::string GameScene::LEADERBOARD_MODE_2_ID = "-";
+const std::string GameScene::ACHIEVEMENT_FIRST_LEVEL = "-";
+const std::string GameScene::ACHIEVEMENT_ALL_LEVELS = "-";
+const std::string GameScene::ACHIEVEMENT_FIRST_3_STARS = "-";
+const std::string GameScene::ACHIEVEMENT_ALL_3_STARS = "-";
+const std::string GameScene::ACHIEVEMENT_PLAY_GAME_2 = "-";
+const std::string GameScene::ACHIEVEMENT_1_WAVE = "-";
+const std::string GameScene::ACHIEVEMENT_10_WAVES = "-";
+const std::string GameScene::ACHIEVEMENT_50_WAVES = "-";
+#endif
+
 bool GameScene::init()
 {
 	if (!cocos2d::Scene::init())
@@ -16,7 +40,7 @@ bool GameScene::init()
 	
 	cocos2d::UserDefault* ud = cocos2d::UserDefault::getInstance();
 	
-	mIsGameServicesAvailable = false;
+	mIsGameServicesAvailable = AppDelegate::pluginGameServices ? AppDelegate::pluginGameServices->isSignedIn() : false;
 	
 	mScreenSize = cocos2d::Director::getInstance()->getWinSize();
 	mVisibleSize = cocos2d::Director::getInstance()->getVisibleSize();
@@ -435,6 +459,9 @@ void GameMode1Scene::endGame(int nr)
 		
 		AppDelegate::pluginAnalytics->logEvent("finished_level", &params);
 	}
+	
+	if (mIsGameServicesAvailable)
+		AppDelegate::pluginGameServices->publishScore(LEADERBOARD_MODE_1_ID, mScore);
 }
 
 void GameMode1Scene::updateDivisor(int d)
@@ -521,6 +548,9 @@ bool GameMode2Scene::init()
 	
 	mCurrentDivisor = -1;
 	mLastBallSpawnX = -1;
+	
+	if (mIsGameServicesAvailable)
+		AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_PLAY_GAME_2);
 	
 	return true;
 }
@@ -667,6 +697,9 @@ void GameMode2InfiniteScene::endGame(int nr)
 		
 		AppDelegate::pluginAnalytics->logEvent("finished_level", &params);
 	}
+	
+	if (mIsGameServicesAvailable)
+		AppDelegate::pluginGameServices->publishScore(LEADERBOARD_MODE_2_ID, mScore);
 }
 
 void GameMode2InfiniteScene::update(float dt)
@@ -763,8 +796,19 @@ void GameMode2InfiniteScene::startWave()
 
 void GameMode2InfiniteScene::endWave()
 {
+	//TODO: move end wave logic after all balls are gone (maybe)
 	if (mWaveNumber == 0)
 		cocos2d::UserDefault::getInstance()->setBoolForKey("skip_tutorial", true);
+	
+	if (mIsGameServicesAvailable)
+	{
+		if (mWaveNumber == 0)
+			AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_1_WAVE);
+		else if (mWaveNumber == 10)
+			AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_10_WAVES);
+		else if (mWaveNumber == 50)
+			AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_50_WAVES);
+	}
 	
 	mWaveNumber++;
 	
@@ -1004,6 +1048,18 @@ void GameMode2LevelScene::update(float dt)
 		mLevel->setScore(mScore);
 		
 		endGame(false);
+		
+		if (mIsGameServicesAvailable)
+		{
+			if (mLevel == &LevelSelectScene::LEVELS[0])
+				AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_FIRST_LEVEL);
+			else if (mLevel == &LevelSelectScene::LEVELS[11])
+				AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_ALL_LEVELS);
+			
+			if (mScore == mLevel->getNrDivisible())
+				AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_FIRST_3_STARS);
+			//TODO: 3 stars for all levels ach
+		}
 	}
 }
 
