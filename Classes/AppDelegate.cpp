@@ -92,7 +92,6 @@ bool AppDelegate::applicationDidFinishLaunching()
 	pluginAnalytics->setCaptureUncaughtException(true);
 	pluginAnalytics->setSessionContinueMillis(300);
 	
-	/*
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
 	const char *gsPluginName = "AppleGameCenter";
 #else
@@ -101,8 +100,8 @@ bool AppDelegate::applicationDidFinishLaunching()
 	pluginGameServices = dynamic_cast<cocos2d::plugin::ProtocolGameServices*>
 			(cocos2d::plugin::PluginManager::getInstance()->loadPlugin(gsPluginName));
 	pluginGameServices->setDebugMode(true);
-	pluginGameServices->startSession();
 	
+	/*
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
 	const char *iapPluginName = "IAPAppleStore";
 #else
