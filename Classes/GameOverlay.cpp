@@ -1,5 +1,6 @@
 #include "GameOverlay.h"
 #include "Helpers.h"
+#include "LevelSelectScene.h"
 
 bool GameOverlay::init()
 {
@@ -301,7 +302,7 @@ bool FinishOverlay::init(int score, int level, int stars)
 	restart->setPosition(getContentSize().width * 0.5f, getContentSize().height * 0.25f);
 	mMenu->addChild(restart);
 	
-	if (stars > 0 && level < 16) //TODO: fix hardcoded value
+	if (stars > 0 && level < LevelSelectScene::LEVEL_NR)
 	{
 		restart->setPositionX(getContentSize().width * 0.33f);
 		
