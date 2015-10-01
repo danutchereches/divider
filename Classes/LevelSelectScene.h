@@ -16,6 +16,7 @@ public:
 	CREATE_FUNC(LevelSelectScene);
 	
 	static Level LEVELS[];
+	static const int LEVEL_NR;
 private:
 	cocos2d::Size mScreenSize;
 	cocos2d::Size mVisibleSize;
