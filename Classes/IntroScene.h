@@ -11,6 +11,7 @@ public:
 	~IntroScene();
 	
 	virtual bool init() override;
+	virtual void onEnter() override;
 	
 	CREATE_FUNC(IntroScene);
 private:
@@ -18,7 +19,10 @@ private:
 	cocos2d::Size mVisibleSize;
 	cocos2d::Vec2 mOrigin;
 	
+	bool mIsGameServicesAvailable;
+	
 	void load(float dt);
+	void update(float dt);
 	
 	void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
 	void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);

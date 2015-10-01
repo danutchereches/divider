@@ -9,6 +9,44 @@ const std::string GameScene::ANALYTICS_WAVE_INDEX = "dimension_3";
 const std::string GameScene::ANALYTICS_DIE_NUMBER_INDEX = "dimension_4";
 const std::string GameScene::ANALYTICS_SCORE_INDEX = "metric_1";
 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+const std::string GameScene::LEADERBOARD_GLOBAL_DIVIDED_ID = "CgkI9qH8t-UMEAIQEQ";
+const std::string GameScene::LEADERBOARD_MODE_1_ID = "CgkI9qH8t-UMEAIQCQ";
+const std::string GameScene::LEADERBOARD_MODE_2_ID = "CgkI9qH8t-UMEAIQCA";
+const std::string GameScene::ACHIEVEMENT_FIRST_LEVEL = "CgkI9qH8t-UMEAIQAQ";
+const std::string GameScene::ACHIEVEMENT_ALL_LEVELS = "CgkI9qH8t-UMEAIQAg";
+const std::string GameScene::ACHIEVEMENT_FIRST_3_STARS = "CgkI9qH8t-UMEAIQAw";
+const std::string GameScene::ACHIEVEMENT_ALL_3_STARS = "CgkI9qH8t-UMEAIQBA";
+const std::string GameScene::ACHIEVEMENT_PLAY_GAME_2 = "CgkI9qH8t-UMEAIQBQ";
+const std::string GameScene::ACHIEVEMENT_1_WAVE = "CgkI9qH8t-UMEAIQCg";
+const std::string GameScene::ACHIEVEMENT_5_WAVES = "CgkI9qH8t-UMEAIQEA";
+const std::string GameScene::ACHIEVEMENT_10_WAVES = "CgkI9qH8t-UMEAIQBg";
+const std::string GameScene::ACHIEVEMENT_50_WAVES = "CgkI9qH8t-UMEAIQBw";
+const std::string GameScene::ACHIEVEMENT_DIVIDE_1_NR = "CgkI9qH8t-UMEAIQDg";
+const std::string GameScene::ACHIEVEMENT_DIVIDE_25_NR = "CgkI9qH8t-UMEAIQDw";
+const std::string GameScene::ACHIEVEMENT_DIVIDE_100_NR = "CgkI9qH8t-UMEAIQCw";
+const std::string GameScene::ACHIEVEMENT_DIVIDE_250_NR = "CgkI9qH8t-UMEAIQDA";
+const std::string GameScene::ACHIEVEMENT_DIVIDE_1000_NR = "CgkI9qH8t-UMEAIQDQ";
+#else
+const std::string GameScene::LEADERBOARD_GLOBAL_DIVIDED_ID = "-";
+const std::string GameScene::LEADERBOARD_MODE_1_ID = "-";
+const std::string GameScene::LEADERBOARD_MODE_2_ID = "-";
+const std::string GameScene::ACHIEVEMENT_FIRST_LEVEL = "-";
+const std::string GameScene::ACHIEVEMENT_ALL_LEVELS = "-";
+const std::string GameScene::ACHIEVEMENT_FIRST_3_STARS = "-";
+const std::string GameScene::ACHIEVEMENT_ALL_3_STARS = "-";
+const std::string GameScene::ACHIEVEMENT_PLAY_GAME_2 = "-";
+const std::string GameScene::ACHIEVEMENT_1_WAVE = "-";
+const std::string GameScene::ACHIEVEMENT_5_WAVES = "-";
+const std::string GameScene::ACHIEVEMENT_10_WAVES = "-";
+const std::string GameScene::ACHIEVEMENT_50_WAVES = "-";
+const std::string GameScene::ACHIEVEMENT_DIVIDE_1_NR = "-";
+const std::string GameScene::ACHIEVEMENT_DIVIDE_25_NR = "-";
+const std::string GameScene::ACHIEVEMENT_DIVIDE_100_NR = "-";
+const std::string GameScene::ACHIEVEMENT_DIVIDE_250_NR = "-";
+const std::string GameScene::ACHIEVEMENT_DIVIDE_1000_NR = "-";
+#endif
+
 bool GameScene::init()
 {
 	if (!cocos2d::Scene::init())
@@ -16,7 +54,7 @@ bool GameScene::init()
 	
 	cocos2d::UserDefault* ud = cocos2d::UserDefault::getInstance();
 	
-	mIsGameServicesAvailable = false;
+	mIsGameServicesAvailable = AppDelegate::pluginGameServices ? AppDelegate::pluginGameServices->isSignedIn() : false;
 	
 	mScreenSize = cocos2d::Director::getInstance()->getWinSize();
 	mVisibleSize = cocos2d::Director::getInstance()->getVisibleSize();
@@ -92,6 +130,8 @@ bool GameScene::init()
 	auto listener4 = cocos2d::EventListenerCustom::create(EVENT_COME_TO_BACKGROUND, CC_CALLBACK_0(GameScene::onComeToBackground, this));
 	dispatcher->addEventListenerWithSceneGraphPriority(listener4, this);
 	
+	mGlobalScore = ud->getIntegerForKey("global_score", 0);
+	
 	mSceneState = GAME_SCENE_STATES::NONE;
 	
 	startGame();
@@ -134,6 +174,33 @@ void GameScene::checkNumbers()
 int GameScene::getNumber()
 {
 	return NUMBER_POOL[rand() % NUMBER_POOL_SIZE];
+}
+
+void GameScene::divideBall(Ball* ball)
+{
+	mGlobalScore++;
+	
+	if (mGlobalScore % 10 == 0)
+		cocos2d::UserDefault::getInstance()->setIntegerForKey("global_score", mGlobalScore);
+	
+	if (mIsGameServicesAvailable)
+	{
+		if (mGlobalScore == 1)
+			AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_DIVIDE_1_NR);
+		else if (mGlobalScore == 25)
+			AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_DIVIDE_25_NR);
+		else if (mGlobalScore == 100)
+			AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_DIVIDE_100_NR);
+		else if (mGlobalScore == 250)
+			AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_DIVIDE_250_NR);
+		else if (mGlobalScore == 1000)
+			AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_DIVIDE_1000_NR);
+	}
+}
+
+void GameScene::missBall(Ball* ball)
+{
+	
 }
 
 void GameScene::initPools()
@@ -233,6 +300,14 @@ void GameScene::endGame(int nr)
 	
 	for (auto it = mBalls.begin(); it != mBalls.end(); it++)
 		(*it)->pause();
+	
+	if (mScore > 0)
+	{
+		cocos2d::UserDefault::getInstance()->setIntegerForKey("global_score", mGlobalScore);
+		
+		if (mIsGameServicesAvailable)
+			AppDelegate::pluginGameServices->publishScore(LEADERBOARD_GLOBAL_DIVIDED_ID, mGlobalScore);
+	}
 }
 
 void GameScene::exitGame()
@@ -435,6 +510,15 @@ void GameMode1Scene::endGame(int nr)
 		
 		AppDelegate::pluginAnalytics->logEvent("finished_level", &params);
 	}
+	
+	int highscore = cocos2d::UserDefault::getInstance()->getIntegerForKey("highscore_mode_1", 0);
+	if (highscore < mScore)
+	{
+		cocos2d::UserDefault::getInstance()->setIntegerForKey("highscore_mode_1", mScore);
+		
+		if (mIsGameServicesAvailable)
+			AppDelegate::pluginGameServices->publishScore(LEADERBOARD_MODE_1_ID, mScore);
+	}
 }
 
 void GameMode1Scene::updateDivisor(int d)
@@ -481,6 +565,8 @@ void GameMode1Scene::spawnBall()
 
 void GameMode1Scene::divideBall(Ball* ball)
 {
+	GameScene::divideBall(ball);
+	
 	mBallPool.recyclePoolItem(ball);
 	mBalls.eraseObject(ball);
 	
@@ -521,6 +607,9 @@ bool GameMode2Scene::init()
 	
 	mCurrentDivisor = -1;
 	mLastBallSpawnX = -1;
+	
+	if (mIsGameServicesAvailable)
+		AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_PLAY_GAME_2);
 	
 	return true;
 }
@@ -592,6 +681,8 @@ void GameMode2Scene::spawnBall()
 
 void GameMode2Scene::divideBall(Ball* ball)
 {
+	GameScene::divideBall(ball);
+	
 	mBallPool.recyclePoolItem(ball);
 	mBalls.eraseObject(ball);
 }
@@ -667,6 +758,20 @@ void GameMode2InfiniteScene::endGame(int nr)
 		
 		AppDelegate::pluginAnalytics->logEvent("finished_level", &params);
 	}
+	
+	//TODO: preload highscores, and maybe save them in bg, or in other thread .. ?
+	int highscore = cocos2d::UserDefault::getInstance()->getIntegerForKey("highscore_mode_2", 0);
+	if (highscore < mScore)
+	{
+		cocos2d::UserDefault::getInstance()->setIntegerForKey("highscore_mode_2", mScore);
+		
+		if (mIsGameServicesAvailable)
+			AppDelegate::pluginGameServices->publishScore(LEADERBOARD_MODE_2_ID, mScore);
+	}
+	
+	int maxWave = cocos2d::UserDefault::getInstance()->getIntegerForKey("max_wave", 0);
+	if (maxWave < mWaveNumber)
+		cocos2d::UserDefault::getInstance()->setIntegerForKey("max_wave", mWaveNumber);
 }
 
 void GameMode2InfiniteScene::update(float dt)
@@ -763,8 +868,21 @@ void GameMode2InfiniteScene::startWave()
 
 void GameMode2InfiniteScene::endWave()
 {
+	//TODO: move end wave (inc mWaveNumber) logic after all balls are gone (maybe)
 	if (mWaveNumber == 0)
 		cocos2d::UserDefault::getInstance()->setBoolForKey("skip_tutorial", true);
+	
+	if (mIsGameServicesAvailable)
+	{
+		if (mWaveNumber == 0)
+			AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_1_WAVE);
+		else if (mWaveNumber == 5)
+			AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_5_WAVES);
+		else if (mWaveNumber == 10)
+			AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_10_WAVES);
+		else if (mWaveNumber == 50)
+			AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_50_WAVES);
+	}
 	
 	mWaveNumber++;
 	
@@ -844,6 +962,8 @@ void GameMode2InfiniteScene::divideBall(Ball* ball)
 
 void GameMode2InfiniteScene::missBall(Ball* ball, bool manual)
 {
+	GameScene::missBall(ball);
+	
 	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("die.wav");
 	
 	endGame(ball->getNumber());
@@ -935,7 +1055,7 @@ bool GameMode2LevelScene::initWithLevelNumber(Level* level)
 void GameMode2LevelScene::endGame(int nr)
 {
 	GameMode2Scene::endGame(nr);
-	//TODO fix this mScore
+	
 	if (nr)
 	{
 		DieOverlay* overlay = DieOverlay::create(nr);
@@ -945,14 +1065,7 @@ void GameMode2LevelScene::endGame(int nr)
 	}
 	else
 	{
-		int stars = mScore >= mLevel->getNrDivisible() * 0.5f
-				? (mScore >= mLevel->getNrDivisible() * 0.75f
-						? (mScore >= mLevel->getNrDivisible() ? 3 : 2)
-						: 1
-				  )
-				: 0;
-		
-		FinishOverlay* overlay = FinishOverlay::create(mScore, mLevel->getId() % 100, stars);
+		FinishOverlay* overlay = FinishOverlay::create(mScore, mLevel->getId() % 100, mLevel->getStars());
 		overlay->restartCallback = CC_CALLBACK_0(GameScene::restartGame, this);
 		overlay->nextLevelCallback = CC_CALLBACK_0(GameScene::exitGame, this); //TODO: fix functionality
 		overlay->exitCallback = CC_CALLBACK_0(GameScene::exitGame, this);
@@ -976,6 +1089,20 @@ void GameMode2LevelScene::endGame(int nr)
 			params.insert(cocos2d::plugin::LogEventParamPair("category", "finished"));
 		
 		AppDelegate::pluginAnalytics->logEvent("finished_level", &params);
+	}
+	
+	if (mIsGameServicesAvailable && !nr)
+	{
+		if (mLevel == &LevelSelectScene::LEVELS[0])
+			AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_FIRST_LEVEL);
+		else if (mLevel == &LevelSelectScene::LEVELS[LevelSelectScene::LEVEL_NR-1])
+			AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_ALL_LEVELS);
+		
+		if (mLevel->getStars() == 3)
+			AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_FIRST_3_STARS);
+		
+		if (Level::getGlobalStars() >= LevelSelectScene::LEVEL_NR * 3)
+			AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_ALL_3_STARS);
 	}
 }
 
@@ -1023,10 +1150,10 @@ void GameMode2LevelScene::divideBall(Ball* ball)
 
 void GameMode2LevelScene::missBall(Ball* ball, bool manual)
 {
+	GameScene::missBall(ball);
+	
 	if (manual)
 	{
-		mLevel->setScore(mScore);
-		
 		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("die.wav");
 		
 		endGame(ball->getNumber());
