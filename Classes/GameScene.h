@@ -31,7 +31,7 @@ public:
 	static const std::string ANALYTICS_WAVE_INDEX;
 	static const std::string ANALYTICS_DIE_NUMBER_INDEX;
 	static const std::string ANALYTICS_SCORE_INDEX;
-	static const std::string LEADERBOARD_ID;
+	static const std::string LEADERBOARD_GLOBAL_DIVIDED_ID;
 	static const std::string LEADERBOARD_MODE_1_ID;
 	static const std::string LEADERBOARD_MODE_2_ID;
 	static const std::string ACHIEVEMENT_FIRST_LEVEL;
@@ -40,8 +40,15 @@ public:
 	static const std::string ACHIEVEMENT_ALL_3_STARS;
 	static const std::string ACHIEVEMENT_PLAY_GAME_2;
 	static const std::string ACHIEVEMENT_1_WAVE;
+	static const std::string ACHIEVEMENT_5_WAVES;
 	static const std::string ACHIEVEMENT_10_WAVES;
 	static const std::string ACHIEVEMENT_50_WAVES;
+	static const std::string ACHIEVEMENT_DIVIDE_1_NR;
+	static const std::string ACHIEVEMENT_DIVIDE_10_NR;
+	static const std::string ACHIEVEMENT_DIVIDE_25_NR;
+	static const std::string ACHIEVEMENT_DIVIDE_100_NR;
+	static const std::string ACHIEVEMENT_DIVIDE_250_NR;
+	static const std::string ACHIEVEMENT_DIVIDE_1000_NR;
 	
 	virtual GameScene* clone() const = 0;
 	
@@ -73,6 +80,7 @@ protected:
 	float mSpawnInterval;
 	
 	int mScore;
+	int mGlobalScore;
 	
 	GAME_SCENE_STATES mSceneState;
 	
@@ -88,8 +96,8 @@ protected:
 	virtual void updateDivisor(int d) = 0;
 	virtual void updateScore();
 	virtual void spawnBall() = 0;
-	virtual void divideBall(Ball* ball) = 0;
-	virtual void missBall(Ball* ball) = 0;
+	virtual void divideBall(Ball* ball);
+	virtual void missBall(Ball* ball);
 	
 	bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
 	void onTouchMoved(cocos2d::Touch* touch, cocos2d::Event* event);
