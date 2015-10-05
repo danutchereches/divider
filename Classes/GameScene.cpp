@@ -108,6 +108,18 @@ bool GameScene::init()
 	mScoreView->setAnchorPoint(cocos2d::Vec2(0.5f, 1));
 	mUILayer->addChild(mScoreView);
 	
+	mMenu = cocos2d::Menu::create();
+	mMenu->ignoreAnchorPointForPosition(false);
+	mMenu->setPosition(cocos2d::Vec2::ZERO);
+	mMenu->setAnchorPoint(cocos2d::Vec2::ZERO);
+	mMenu->setContentSize(mUILayer->getContentSize());
+	mUILayer->addChild(mMenu);
+	
+	auto pauseBtn = cocos2d::MenuItemSprite::create(cocos2d::Sprite::createWithSpriteFrameName("pause_btn"),
+			nullptr, [this] (cocos2d::Ref* btn) { pauseGame(); });
+	pauseBtn->setPosition(9, 9);
+	mMenu->addChild(pauseBtn);
+	
 	initPools();
 	
 	// Register Touch Event
@@ -444,14 +456,6 @@ bool GameMode1Scene::init()
 	
 	mDivisorMin = 1;
 	
-	cocos2d::Menu* bottomMenu = cocos2d::Menu::create();
-	bottomMenu->ignoreAnchorPointForPosition(false);
-	bottomMenu->setPosition(cocos2d::Vec2::ZERO);
-	bottomMenu->setAnchorPoint(cocos2d::Vec2::ZERO);
-	bottomMenu->setContentSize(mTopBar->getContentSize());
-	bottomMenu->setTag(343);
-	mTopBar->addChild(bottomMenu);
-	
 	float dw = mTopBar->getContentSize().width / (mDivisorMax - mDivisorMin);
 	std::function<void(cocos2d::Ref*)> callback = [this](cocos2d::Ref* node) {
 		cocos2d::MenuItem* menuItem = dynamic_cast<cocos2d::MenuItem*>(node);
@@ -473,7 +477,7 @@ bool GameMode1Scene::init()
 		divisor->setContentSize(cocos2d::Size(dw, mTopBar->getContentSize().height));
 		divisor->setAnchorPoint(cocos2d::Vec2::ZERO);
 		divisor->setTag(DIVISORS[i]);
-		bottomMenu->addChild(divisor);
+		mMenu->addChild(divisor);
 	}
 	
 	mSpawnInterval = 1.8f;
@@ -525,9 +529,8 @@ void GameMode1Scene::updateDivisor(int d)
 {
 	mCurrentDivisor = d;
 	
-	cocos2d::Node* menu = mTopBar->getChildByTag(343);
-	cocos2d::Vector<cocos2d::Node*> items = menu->getChildren();
-	if (items.size() != (mDivisorMax - mDivisorMin))
+	cocos2d::Vector<cocos2d::Node*> items = mMenu->getChildren();
+	if (items.size() - 1 /* pause btn */ != (mDivisorMax - mDivisorMin))
 	{
 		cocos2d::log("ERROR: wrong number of items in divisors menu. (%d vs %d required)", (int) items.size(), (mDivisorMax - mDivisorMin));
 		AppDelegate::closeApp();
@@ -538,6 +541,10 @@ void GameMode1Scene::updateDivisor(int d)
 	{
 		cocos2d::Node* item = (*it);
 		cocos2d::Label* label = dynamic_cast<cocos2d::Label*>(item->getChildren().front());
+		
+		if (label == nullptr)
+			continue;
+		
 		if (mCurrentDivisor == (*it)->getTag())
 		{
 			label->setScale(1.0f);
