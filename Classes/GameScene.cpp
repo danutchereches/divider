@@ -106,6 +106,7 @@ bool GameScene::init()
 			scoreTitle->getPosition().x - scoreTitle->getContentSize().width * scoreTitle->getAnchorPoint().x + scoreTitle->getContentSize().width * 0.5f,
 			scoreTitle->getPosition().y - scoreTitle->getContentSize().height * scoreTitle->getAnchorPoint().y - 1));
 	mScoreView->setAnchorPoint(cocos2d::Vec2(0.5f, 1));
+	mScoreView->enableShadow(cocos2d::Color4B::BLACK, cocos2d::Size(0.25f, -0.25f));
 	mUILayer->addChild(mScoreView);
 	
 	mMenu = cocos2d::Menu::create();
@@ -610,6 +611,7 @@ bool GameMode2Scene::init()
 	
 	mCurrentDivisorLabel = cocos2d::Label::createWithTTF("", "fonts/semibold.otf", 8);
 	mCurrentDivisorLabel->setPosition(mTopBar->getContentSize().width * 0.5f, mTopBar->getContentSize().height * 0.52f);
+	mCurrentDivisorLabel->enableShadow(cocos2d::Color4B::BLACK, cocos2d::Size(0.25f, -0.25f));
 	mTopBar->addChild(mCurrentDivisorLabel);
 	
 	mCurrentDivisor = -1;
@@ -730,6 +732,7 @@ bool GameMode2InfiniteScene::init()
 			waveTitle->getPosition().x - waveTitle->getContentSize().width * waveTitle->getAnchorPoint().x + waveTitle->getContentSize().width * 0.5f,
 			waveTitle->getPosition().y - waveTitle->getContentSize().height * waveTitle->getAnchorPoint().y - 1.0f));
 	mWaveLabel->setAnchorPoint(cocos2d::Vec2(0.5f, 1));
+	mWaveLabel->enableShadow(cocos2d::Color4B::BLACK, cocos2d::Size(0.25f, -0.25f));
 	mUILayer->addChild(mWaveLabel);
 	
 	setDivisorRange();
@@ -1044,6 +1047,7 @@ bool GameMode2LevelScene::initWithLevelNumber(Level* level)
 			timeTitle->getPosition().x - timeTitle->getContentSize().width * timeTitle->getAnchorPoint().x + timeTitle->getContentSize().width * 0.5f,
 			timeTitle->getPosition().y - timeTitle->getContentSize().height * timeTitle->getAnchorPoint().y - 1.0f));
 	mTimerLabel->setAnchorPoint(cocos2d::Vec2(0.5f, 1));
+	mTimerLabel->enableShadow(cocos2d::Color4B::BLACK, cocos2d::Size(0.25f, -0.25f));
 	mUILayer->addChild(mTimerLabel);
 	
 	cocos2d::Label* tutorial1 = cocos2d::Label::createWithTTF(
@@ -1054,6 +1058,7 @@ bool GameMode2LevelScene::initWithLevelNumber(Level* level)
 	tutorial1->setOpacity(0);
 	tutorial1->setPosition(mUILayer->getContentSize().width * 0.5f, mUILayer->getContentSize().height * 0.55f);
 	tutorial1->setAnchorPoint(cocos2d::Vec2(0.5f, 0));
+	tutorial1->enableShadow(cocos2d::Color4B::BLACK, cocos2d::Size(0.25f, -0.25f));
 	mUILayer->addChild(tutorial1);
 	
 	tutorial1->runAction(cocos2d::Sequence::create(
@@ -1075,6 +1080,7 @@ bool GameMode2LevelScene::initWithLevelNumber(Level* level)
 	tutorial2->setOpacity(0);
 	tutorial2->setPosition(mUILayer->getContentSize().width * 0.5f, mUILayer->getContentSize().height * 0.50f);
 	tutorial2->setAnchorPoint(cocos2d::Vec2(0.5f, 1));
+	tutorial2->enableShadow(cocos2d::Color4B::BLACK, cocos2d::Size(0.25f, -0.25f));
 	mUILayer->addChild(tutorial2);
 	
 	tutorial2->runAction(cocos2d::Sequence::create(

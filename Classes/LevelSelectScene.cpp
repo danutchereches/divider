@@ -97,7 +97,7 @@ bool LevelSelectScene::init()
 			menuItem->addChild(btnBg);
 			
 			cocos2d::Label* label = cocos2d::Label::createWithTTF(helpers::String::format("%d", levelNr+1), "fonts/semibold.otf", 6);
-			//label->enableShadow(cocos2d::Color4B::BLACK, cocos2d::Size(0.0f, -0.5f));
+			label->enableShadow(cocos2d::Color4B::BLACK, cocos2d::Size(0.25f, -0.25f));
 			label->setPosition(btnBg->getContentSize().width/2, btnBg->getContentSize().height*0.5f);
 			/*
 			cocos2d::Label* label = cocos2d::Label::createWithCharMap(frame->getTexture(),
