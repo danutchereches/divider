@@ -91,7 +91,7 @@ bool GameScene::init()
 	
 	mTopBar = cocos2d::LayerColor::create(cocos2d::Color4B(0, 0, 0, 30));
 	mTopBar->ignoreAnchorPointForPosition(false);
-	mTopBar->setPosition(0, mOrigin.y + mVisibleSize.height);
+	mTopBar->setPosition(0, mUILayer->getContentSize().height);
 	mTopBar->setAnchorPoint(cocos2d::Vec2(0, 1));
 	mTopBar->setContentSize(cocos2d::Size(mUILayer->getContentSize().width, 15));
 	mUILayer->addChild(mTopBar);
@@ -456,7 +456,7 @@ bool GameMode1Scene::init()
 	
 	mDivisorMin = 1;
 	
-	float dw = mTopBar->getContentSize().width / (mDivisorMax - mDivisorMin);
+	float dw = (mTopBar->getContentSize().width - 20) / (mDivisorMax - mDivisorMin);
 	std::function<void(cocos2d::Ref*)> callback = [this](cocos2d::Ref* node) {
 		cocos2d::MenuItem* menuItem = dynamic_cast<cocos2d::MenuItem*>(node);
 		if (menuItem == nullptr)
@@ -473,9 +473,9 @@ bool GameMode1Scene::init()
 		cocos2d::MenuItemLabel* divisor = cocos2d::MenuItemLabel::create(label, callback);
 		label->setPosition(cocos2d::Vec2(dw/2, mTopBar->getContentSize().height/2));
 		label->setAnchorPoint(cocos2d::Vec2::ANCHOR_MIDDLE);
-		divisor->setPosition((i - mDivisorMin) * dw, 0);
+		divisor->setPosition((i - mDivisorMin) * dw, mMenu->getContentSize().height);
 		divisor->setContentSize(cocos2d::Size(dw, mTopBar->getContentSize().height));
-		divisor->setAnchorPoint(cocos2d::Vec2::ZERO);
+		divisor->setAnchorPoint(cocos2d::Vec2(0, 1));
 		divisor->setTag(DIVISORS[i]);
 		mMenu->addChild(divisor);
 	}
