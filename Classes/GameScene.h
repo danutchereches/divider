@@ -68,6 +68,7 @@ protected:
 	
 	cocos2d::LayerColor* mTopBar;
 	cocos2d::Label* mScoreView;
+	cocos2d::Menu* mMenu;
 	
 	BallPool mBallPool;
 	cocos2d::Vector<Ball*> mBalls;
