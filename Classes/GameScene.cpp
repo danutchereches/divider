@@ -96,12 +96,12 @@ bool GameScene::init()
 	mTopBar->setContentSize(cocos2d::Size(mUILayer->getContentSize().width, 15));
 	mUILayer->addChild(mTopBar);
 	
-	cocos2d::Label* scoreTitle = cocos2d::Label::createWithTTF("SCORE", "fonts/default.otf", 5);
+	cocos2d::Label* scoreTitle = cocos2d::Label::createWithTTF("SCORE", "fonts/semibold.otf", 5);
 	scoreTitle->setPosition(cocos2d::Vec2(mUILayer->getContentSize().width - 12, mUILayer->getContentSize().height - 1));
 	scoreTitle->setAnchorPoint(cocos2d::Vec2(0.5f, 1));
 	mUILayer->addChild(scoreTitle);
 	
-	mScoreView = cocos2d::Label::createWithTTF("", "fonts/default.otf", 9);
+	mScoreView = cocos2d::Label::createWithTTF("", "fonts/semibold.otf", 9);
 	mScoreView->setPosition(cocos2d::Vec2(
 			scoreTitle->getPosition().x - scoreTitle->getContentSize().width * scoreTitle->getAnchorPoint().x + scoreTitle->getContentSize().width * 0.5f,
 			scoreTitle->getPosition().y - scoreTitle->getContentSize().height * scoreTitle->getAnchorPoint().y - 1));
@@ -469,7 +469,7 @@ bool GameMode1Scene::init()
 	};
 	for (int i = mDivisorMin; i < mDivisorMax; i++)
 	{
-		cocos2d::Label* label = cocos2d::Label::createWithTTF(cocos2d::__String::createWithFormat("%d", DIVISORS[i])->_string, "fonts/default.otf", 12);
+		cocos2d::Label* label = cocos2d::Label::createWithTTF(cocos2d::__String::createWithFormat("%d", DIVISORS[i])->_string, "fonts/semibold.otf", 12);
 		cocos2d::MenuItemLabel* divisor = cocos2d::MenuItemLabel::create(label, callback);
 		label->setPosition(cocos2d::Vec2(dw/2, mTopBar->getContentSize().height/2));
 		label->setAnchorPoint(cocos2d::Vec2::ANCHOR_MIDDLE);
@@ -704,11 +704,11 @@ bool GameMode2InfiniteScene::init()
 	if (!GameMode2Scene::init())
 		return false;
 	
-//	mPreviousDivisorLabel = cocos2d::Label::createWithTTF("", "fonts/default.otf", 6);
+//	mPreviousDivisorLabel = cocos2d::Label::createWithTTF("", "fonts/semibold.otf", 6);
 //	mPreviousDivisorLabel->setPosition(mTopBar->getContentSize().width * 0.3f, mTopBar->getContentSize().height/2);
 //	mTopBar->addChild(mPreviousDivisorLabel);
 	
-	mNextDivisorLabel = cocos2d::Label::createWithTTF("", "fonts/default.otf", 5);
+	mNextDivisorLabel = cocos2d::Label::createWithTTF("", "fonts/semibold.otf", 5);
 	mNextDivisorLabel->setPosition(mTopBar->getContentSize().width * 0.68f, mTopBar->getContentSize().height/2);
 	mNextDivisorLabel->setVisible(false);
 	mTopBar->addChild(mNextDivisorLabel);
@@ -720,12 +720,12 @@ bool GameMode2InfiniteScene::init()
 	mCurrentDivisor = -1;
 	mNextDivisor = -1;
 	
-	cocos2d::Label* waveTitle = cocos2d::Label::createWithTTF("WAVE", "fonts/default.otf", 5);
+	cocos2d::Label* waveTitle = cocos2d::Label::createWithTTF("WAVE", "fonts/semibold.otf", 5);
 	waveTitle->setPosition(cocos2d::Vec2(12, mUILayer->getContentSize().height - 1));
 	waveTitle->setAnchorPoint(cocos2d::Vec2(0.5f, 1));
 	mUILayer->addChild(waveTitle);
 	
-	mWaveLabel = cocos2d::Label::createWithTTF("", "fonts/default.otf", 9);
+	mWaveLabel = cocos2d::Label::createWithTTF("", "fonts/semibold.otf", 9);
 	mWaveLabel->setPosition(cocos2d::Vec2(
 			waveTitle->getPosition().x - waveTitle->getContentSize().width * waveTitle->getAnchorPoint().x + waveTitle->getContentSize().width * 0.5f,
 			waveTitle->getPosition().y - waveTitle->getContentSize().height * waveTitle->getAnchorPoint().y - 1.0f));
@@ -1034,12 +1034,12 @@ bool GameMode2LevelScene::initWithLevelNumber(Level* level)
 	mBallSpeed = mLevel->getSpeed();
 	mSpawnInterval = (mLevelTimer-10) / mNumbersSize;
 	
-	cocos2d::Label* timeTitle = cocos2d::Label::createWithTTF("TIME", "fonts/default.otf", 5);
+	cocos2d::Label* timeTitle = cocos2d::Label::createWithTTF("TIME", "fonts/semibold.otf", 5);
 	timeTitle->setPosition(cocos2d::Vec2(12, mUILayer->getContentSize().height - 1));
 	timeTitle->setAnchorPoint(cocos2d::Vec2(0.5f, 1));
 	mUILayer->addChild(timeTitle);
 	
-	mTimerLabel = cocos2d::Label::createWithTTF("", "fonts/default.otf", 9);
+	mTimerLabel = cocos2d::Label::createWithTTF("", "fonts/semibold.otf", 9);
 	mTimerLabel->setPosition(cocos2d::Vec2(
 			timeTitle->getPosition().x - timeTitle->getContentSize().width * timeTitle->getAnchorPoint().x + timeTitle->getContentSize().width * 0.5f,
 			timeTitle->getPosition().y - timeTitle->getContentSize().height * timeTitle->getAnchorPoint().y - 1.0f));
