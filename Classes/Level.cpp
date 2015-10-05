@@ -1,4 +1,5 @@
 #include "Level.h"
+#include "LevelSelectScene.h"
 
 int Level::getProgress()
 {
@@ -12,6 +13,16 @@ int Level::getProgress()
 	}
 	
 	return l;
+}
+
+int Level::getGlobalStars()
+{
+	int n = 0;
+	
+	for (int i = 0; i < LevelSelectScene::LEVEL_NR; i++)
+		n += LevelSelectScene::LEVELS[i].getStars();
+	
+	return n;
 }
 
 Level::Level(int id, int d, int s, int nrd, int nrid)
@@ -41,4 +52,18 @@ void Level::setScore(const int score, bool save/* = true */)
 		cocos2d::UserDefault::getInstance()->setIntegerForKey(helpers::String::format("score_%d", mId).c_str(), score);
 	
 	mScore = score;
+}
+
+int Level::getStars()
+{
+	if (getScore() >= getNrDivisible())
+		return 3;
+	
+	if (getScore() >= getNrDivisible() * 0.75f)
+		return 2;
+	
+	if (getScore() >= getNrDivisible() * 0.5f)
+		return 1;
+	
+	return 0;
 }

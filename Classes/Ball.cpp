@@ -11,6 +11,7 @@ bool Ball::init()
 	mNumber = 0;
 	mLabel = cocos2d::Label::createWithTTF("0", "fonts/semibold.otf", 6);
 	mLabel->setPosition(getContentSize().width/2, getContentSize().height/2);
+	mLabel->enableShadow(cocos2d::Color4B::BLACK, cocos2d::Size(0.25f, -0.25f));
 	this->addChild(mLabel);
 	
 	return true;

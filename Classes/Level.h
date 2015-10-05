@@ -6,6 +6,7 @@ class Level
 {
 public:
 	static int getProgress();
+	static int getGlobalStars();
 	
 	Level(int id, int d, int s, int nrd, int nrid);
 	
@@ -14,6 +15,7 @@ public:
 	inline int getNrDivisible() { return mNrDivisible; }
 	inline int getNrIndivisible() { return mNrIndivisible; }
 	inline int getSpeed() { return mSpeed; }
+	int getStars();
 	const int getScore();
 	void setScore(const int score, bool save = true);
 private:

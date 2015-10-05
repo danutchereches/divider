@@ -18,6 +18,7 @@ Level LevelSelectScene::LEVELS[] =
 		Level(114, 9, 14.5f, 20, 50), // level 14
 		Level(115, 7, 17.0f, 20, 80)  // level 15
 };
+const int LevelSelectScene::LEVEL_NR = 15;
 
 LevelSelectScene::LevelSelectScene() : mMenu(nullptr)
 {
@@ -70,7 +71,7 @@ bool LevelSelectScene::init()
 	cocos2d::MenuItem* menuItem;
 	float width = (mVisibleSize.width - 20) / 3;
 	float height = (mVisibleSize.height - 40) / 5;
-	int n = sizeof(LEVELS)/sizeof(Level);
+	int n = LEVEL_NR;
 	//cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName("bitmap_font");
 	//cocos2d::log("rect %f %f", frame->getOriginalSize().width, frame->getOriginalSizeInPixels().height);
 	
@@ -96,7 +97,7 @@ bool LevelSelectScene::init()
 			menuItem->addChild(btnBg);
 			
 			cocos2d::Label* label = cocos2d::Label::createWithTTF(helpers::String::format("%d", levelNr+1), "fonts/semibold.otf", 6);
-			//label->enableShadow(cocos2d::Color4B::BLACK, cocos2d::Size(0.0f, -0.5f));
+			label->enableShadow(cocos2d::Color4B::BLACK, cocos2d::Size(0.25f, -0.25f));
 			label->setPosition(btnBg->getContentSize().width/2, btnBg->getContentSize().height*0.5f);
 			/*
 			cocos2d::Label* label = cocos2d::Label::createWithCharMap(frame->getTexture(),
@@ -171,7 +172,7 @@ void LevelSelectScene::onEnter()
 			label->setColor(cocos2d::Color3B::GRAY);
 		}
 		
-		if (LEVELS[i].getScore() >= LEVELS[i].getNrDivisible() * 0.5f)
+		if (LEVELS[i].getStars() >= 1)
 		{
 			star = dynamic_cast<cocos2d::Sprite*>(menuItem->getChildByTag(1));
 			star->setSpriteFrame(starW);
@@ -180,13 +181,13 @@ void LevelSelectScene::onEnter()
 		else
 			unlock = false;
 		
-		if (LEVELS[i].getScore() >= LEVELS[i].getNrDivisible() * 0.75f)
+		if (LEVELS[i].getStars() >= 2)
 		{
 			star = dynamic_cast<cocos2d::Sprite*>(menuItem->getChildByTag(2));
 			star->setSpriteFrame(starW);
 		}
 		
-		if (LEVELS[i].getScore() >= LEVELS[i].getNrDivisible())
+		if (LEVELS[i].getStars() >= 3)
 		{
 			star = dynamic_cast<cocos2d::Sprite*>(menuItem->getChildByTag(3));
 			star->setSpriteFrame(starW);

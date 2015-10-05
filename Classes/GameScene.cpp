@@ -10,6 +10,7 @@ const std::string GameScene::ANALYTICS_DIE_NUMBER_INDEX = "dimension_4";
 const std::string GameScene::ANALYTICS_SCORE_INDEX = "metric_1";
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+const std::string GameScene::LEADERBOARD_GLOBAL_DIVIDED_ID = "CgkI9qH8t-UMEAIQEQ";
 const std::string GameScene::LEADERBOARD_MODE_1_ID = "CgkI9qH8t-UMEAIQCQ";
 const std::string GameScene::LEADERBOARD_MODE_2_ID = "CgkI9qH8t-UMEAIQCA";
 const std::string GameScene::ACHIEVEMENT_FIRST_LEVEL = "CgkI9qH8t-UMEAIQAQ";
@@ -18,9 +19,16 @@ const std::string GameScene::ACHIEVEMENT_FIRST_3_STARS = "CgkI9qH8t-UMEAIQAw";
 const std::string GameScene::ACHIEVEMENT_ALL_3_STARS = "CgkI9qH8t-UMEAIQBA";
 const std::string GameScene::ACHIEVEMENT_PLAY_GAME_2 = "CgkI9qH8t-UMEAIQBQ";
 const std::string GameScene::ACHIEVEMENT_1_WAVE = "CgkI9qH8t-UMEAIQCg";
+const std::string GameScene::ACHIEVEMENT_5_WAVES = "CgkI9qH8t-UMEAIQEA";
 const std::string GameScene::ACHIEVEMENT_10_WAVES = "CgkI9qH8t-UMEAIQBg";
 const std::string GameScene::ACHIEVEMENT_50_WAVES = "CgkI9qH8t-UMEAIQBw";
+const std::string GameScene::ACHIEVEMENT_DIVIDE_1_NR = "CgkI9qH8t-UMEAIQDg";
+const std::string GameScene::ACHIEVEMENT_DIVIDE_25_NR = "CgkI9qH8t-UMEAIQDw";
+const std::string GameScene::ACHIEVEMENT_DIVIDE_100_NR = "CgkI9qH8t-UMEAIQCw";
+const std::string GameScene::ACHIEVEMENT_DIVIDE_250_NR = "CgkI9qH8t-UMEAIQDA";
+const std::string GameScene::ACHIEVEMENT_DIVIDE_1000_NR = "CgkI9qH8t-UMEAIQDQ";
 #else
+const std::string GameScene::LEADERBOARD_GLOBAL_DIVIDED_ID = "-";
 const std::string GameScene::LEADERBOARD_MODE_1_ID = "-";
 const std::string GameScene::LEADERBOARD_MODE_2_ID = "-";
 const std::string GameScene::ACHIEVEMENT_FIRST_LEVEL = "-";
@@ -29,8 +37,14 @@ const std::string GameScene::ACHIEVEMENT_FIRST_3_STARS = "-";
 const std::string GameScene::ACHIEVEMENT_ALL_3_STARS = "-";
 const std::string GameScene::ACHIEVEMENT_PLAY_GAME_2 = "-";
 const std::string GameScene::ACHIEVEMENT_1_WAVE = "-";
+const std::string GameScene::ACHIEVEMENT_5_WAVES = "-";
 const std::string GameScene::ACHIEVEMENT_10_WAVES = "-";
 const std::string GameScene::ACHIEVEMENT_50_WAVES = "-";
+const std::string GameScene::ACHIEVEMENT_DIVIDE_1_NR = "-";
+const std::string GameScene::ACHIEVEMENT_DIVIDE_25_NR = "-";
+const std::string GameScene::ACHIEVEMENT_DIVIDE_100_NR = "-";
+const std::string GameScene::ACHIEVEMENT_DIVIDE_250_NR = "-";
+const std::string GameScene::ACHIEVEMENT_DIVIDE_1000_NR = "-";
 #endif
 
 bool GameScene::init()
@@ -77,22 +91,35 @@ bool GameScene::init()
 	
 	mTopBar = cocos2d::LayerColor::create(cocos2d::Color4B(0, 0, 0, 30));
 	mTopBar->ignoreAnchorPointForPosition(false);
-	mTopBar->setPosition(0, mOrigin.y + mVisibleSize.height);
+	mTopBar->setPosition(0, mUILayer->getContentSize().height);
 	mTopBar->setAnchorPoint(cocos2d::Vec2(0, 1));
 	mTopBar->setContentSize(cocos2d::Size(mUILayer->getContentSize().width, 15));
 	mUILayer->addChild(mTopBar);
 	
-	cocos2d::Label* scoreTitle = cocos2d::Label::createWithTTF("SCORE", "fonts/default.otf", 5);
+	cocos2d::Label* scoreTitle = cocos2d::Label::createWithTTF("SCORE", "fonts/semibold.otf", 5);
 	scoreTitle->setPosition(cocos2d::Vec2(mUILayer->getContentSize().width - 12, mUILayer->getContentSize().height - 1));
 	scoreTitle->setAnchorPoint(cocos2d::Vec2(0.5f, 1));
 	mUILayer->addChild(scoreTitle);
 	
-	mScoreView = cocos2d::Label::createWithTTF("", "fonts/default.otf", 9);
+	mScoreView = cocos2d::Label::createWithTTF("", "fonts/semibold.otf", 9);
 	mScoreView->setPosition(cocos2d::Vec2(
 			scoreTitle->getPosition().x - scoreTitle->getContentSize().width * scoreTitle->getAnchorPoint().x + scoreTitle->getContentSize().width * 0.5f,
 			scoreTitle->getPosition().y - scoreTitle->getContentSize().height * scoreTitle->getAnchorPoint().y - 1));
 	mScoreView->setAnchorPoint(cocos2d::Vec2(0.5f, 1));
+	mScoreView->enableShadow(cocos2d::Color4B::BLACK, cocos2d::Size(0.25f, -0.25f));
 	mUILayer->addChild(mScoreView);
+	
+	mMenu = cocos2d::Menu::create();
+	mMenu->ignoreAnchorPointForPosition(false);
+	mMenu->setPosition(cocos2d::Vec2::ZERO);
+	mMenu->setAnchorPoint(cocos2d::Vec2::ZERO);
+	mMenu->setContentSize(mUILayer->getContentSize());
+	mUILayer->addChild(mMenu);
+	
+	auto pauseBtn = cocos2d::MenuItemSprite::create(cocos2d::Sprite::createWithSpriteFrameName("pause_btn"),
+			nullptr, [this] (cocos2d::Ref* btn) { pauseGame(); });
+	pauseBtn->setPosition(9, 9);
+	mMenu->addChild(pauseBtn);
 	
 	initPools();
 	
@@ -115,6 +142,8 @@ bool GameScene::init()
 	
 	auto listener4 = cocos2d::EventListenerCustom::create(EVENT_COME_TO_BACKGROUND, CC_CALLBACK_0(GameScene::onComeToBackground, this));
 	dispatcher->addEventListenerWithSceneGraphPriority(listener4, this);
+	
+	mGlobalScore = ud->getIntegerForKey("global_score", 0);
 	
 	mSceneState = GAME_SCENE_STATES::NONE;
 	
@@ -158,6 +187,33 @@ void GameScene::checkNumbers()
 int GameScene::getNumber()
 {
 	return NUMBER_POOL[rand() % NUMBER_POOL_SIZE];
+}
+
+void GameScene::divideBall(Ball* ball)
+{
+	mGlobalScore++;
+	
+	if (mGlobalScore % 10 == 0)
+		cocos2d::UserDefault::getInstance()->setIntegerForKey("global_score", mGlobalScore);
+	
+	if (mIsGameServicesAvailable)
+	{
+		if (mGlobalScore == 1)
+			AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_DIVIDE_1_NR);
+		else if (mGlobalScore == 25)
+			AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_DIVIDE_25_NR);
+		else if (mGlobalScore == 100)
+			AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_DIVIDE_100_NR);
+		else if (mGlobalScore == 250)
+			AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_DIVIDE_250_NR);
+		else if (mGlobalScore == 1000)
+			AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_DIVIDE_1000_NR);
+	}
+}
+
+void GameScene::missBall(Ball* ball)
+{
+	
 }
 
 void GameScene::initPools()
@@ -257,6 +313,14 @@ void GameScene::endGame(int nr)
 	
 	for (auto it = mBalls.begin(); it != mBalls.end(); it++)
 		(*it)->pause();
+	
+	if (mScore > 0)
+	{
+		cocos2d::UserDefault::getInstance()->setIntegerForKey("global_score", mGlobalScore);
+		
+		if (mIsGameServicesAvailable)
+			AppDelegate::pluginGameServices->publishScore(LEADERBOARD_GLOBAL_DIVIDED_ID, mGlobalScore);
+	}
 }
 
 void GameScene::exitGame()
@@ -393,15 +457,7 @@ bool GameMode1Scene::init()
 	
 	mDivisorMin = 1;
 	
-	cocos2d::Menu* bottomMenu = cocos2d::Menu::create();
-	bottomMenu->ignoreAnchorPointForPosition(false);
-	bottomMenu->setPosition(cocos2d::Vec2::ZERO);
-	bottomMenu->setAnchorPoint(cocos2d::Vec2::ZERO);
-	bottomMenu->setContentSize(mTopBar->getContentSize());
-	bottomMenu->setTag(343);
-	mTopBar->addChild(bottomMenu);
-	
-	float dw = mTopBar->getContentSize().width / (mDivisorMax - mDivisorMin);
+	float dw = (mTopBar->getContentSize().width - 20) / (mDivisorMax - mDivisorMin);
 	std::function<void(cocos2d::Ref*)> callback = [this](cocos2d::Ref* node) {
 		cocos2d::MenuItem* menuItem = dynamic_cast<cocos2d::MenuItem*>(node);
 		if (menuItem == nullptr)
@@ -414,15 +470,15 @@ bool GameMode1Scene::init()
 	};
 	for (int i = mDivisorMin; i < mDivisorMax; i++)
 	{
-		cocos2d::Label* label = cocos2d::Label::createWithTTF(cocos2d::__String::createWithFormat("%d", DIVISORS[i])->_string, "fonts/default.otf", 12);
+		cocos2d::Label* label = cocos2d::Label::createWithTTF(cocos2d::__String::createWithFormat("%d", DIVISORS[i])->_string, "fonts/semibold.otf", 12);
 		cocos2d::MenuItemLabel* divisor = cocos2d::MenuItemLabel::create(label, callback);
 		label->setPosition(cocos2d::Vec2(dw/2, mTopBar->getContentSize().height/2));
 		label->setAnchorPoint(cocos2d::Vec2::ANCHOR_MIDDLE);
-		divisor->setPosition((i - mDivisorMin) * dw, 0);
+		divisor->setPosition((i - mDivisorMin) * dw, mMenu->getContentSize().height);
 		divisor->setContentSize(cocos2d::Size(dw, mTopBar->getContentSize().height));
-		divisor->setAnchorPoint(cocos2d::Vec2::ZERO);
+		divisor->setAnchorPoint(cocos2d::Vec2(0, 1));
 		divisor->setTag(DIVISORS[i]);
-		bottomMenu->addChild(divisor);
+		mMenu->addChild(divisor);
 	}
 	
 	mSpawnInterval = 1.8f;
@@ -460,17 +516,22 @@ void GameMode1Scene::endGame(int nr)
 		AppDelegate::pluginAnalytics->logEvent("finished_level", &params);
 	}
 	
-	if (mIsGameServicesAvailable)
-		AppDelegate::pluginGameServices->publishScore(LEADERBOARD_MODE_1_ID, mScore);
+	int highscore = cocos2d::UserDefault::getInstance()->getIntegerForKey("highscore_mode_1", 0);
+	if (highscore < mScore)
+	{
+		cocos2d::UserDefault::getInstance()->setIntegerForKey("highscore_mode_1", mScore);
+		
+		if (mIsGameServicesAvailable)
+			AppDelegate::pluginGameServices->publishScore(LEADERBOARD_MODE_1_ID, mScore);
+	}
 }
 
 void GameMode1Scene::updateDivisor(int d)
 {
 	mCurrentDivisor = d;
 	
-	cocos2d::Node* menu = mTopBar->getChildByTag(343);
-	cocos2d::Vector<cocos2d::Node*> items = menu->getChildren();
-	if (items.size() != (mDivisorMax - mDivisorMin))
+	cocos2d::Vector<cocos2d::Node*> items = mMenu->getChildren();
+	if (items.size() - 1 /* pause btn */ != (mDivisorMax - mDivisorMin))
 	{
 		cocos2d::log("ERROR: wrong number of items in divisors menu. (%d vs %d required)", (int) items.size(), (mDivisorMax - mDivisorMin));
 		AppDelegate::closeApp();
@@ -481,6 +542,10 @@ void GameMode1Scene::updateDivisor(int d)
 	{
 		cocos2d::Node* item = (*it);
 		cocos2d::Label* label = dynamic_cast<cocos2d::Label*>(item->getChildren().front());
+		
+		if (label == nullptr)
+			continue;
+		
 		if (mCurrentDivisor == (*it)->getTag())
 		{
 			label->setScale(1.0f);
@@ -508,6 +573,8 @@ void GameMode1Scene::spawnBall()
 
 void GameMode1Scene::divideBall(Ball* ball)
 {
+	GameScene::divideBall(ball);
+	
 	mBallPool.recyclePoolItem(ball);
 	mBalls.eraseObject(ball);
 	
@@ -544,6 +611,7 @@ bool GameMode2Scene::init()
 	
 	mCurrentDivisorLabel = cocos2d::Label::createWithTTF("", "fonts/semibold.otf", 8);
 	mCurrentDivisorLabel->setPosition(mTopBar->getContentSize().width * 0.5f, mTopBar->getContentSize().height * 0.52f);
+	mCurrentDivisorLabel->enableShadow(cocos2d::Color4B::BLACK, cocos2d::Size(0.25f, -0.25f));
 	mTopBar->addChild(mCurrentDivisorLabel);
 	
 	mCurrentDivisor = -1;
@@ -622,6 +690,8 @@ void GameMode2Scene::spawnBall()
 
 void GameMode2Scene::divideBall(Ball* ball)
 {
+	GameScene::divideBall(ball);
+	
 	mBallPool.recyclePoolItem(ball);
 	mBalls.eraseObject(ball);
 }
@@ -636,11 +706,11 @@ bool GameMode2InfiniteScene::init()
 	if (!GameMode2Scene::init())
 		return false;
 	
-//	mPreviousDivisorLabel = cocos2d::Label::createWithTTF("", "fonts/default.otf", 6);
+//	mPreviousDivisorLabel = cocos2d::Label::createWithTTF("", "fonts/semibold.otf", 6);
 //	mPreviousDivisorLabel->setPosition(mTopBar->getContentSize().width * 0.3f, mTopBar->getContentSize().height/2);
 //	mTopBar->addChild(mPreviousDivisorLabel);
 	
-	mNextDivisorLabel = cocos2d::Label::createWithTTF("", "fonts/default.otf", 5);
+	mNextDivisorLabel = cocos2d::Label::createWithTTF("", "fonts/semibold.otf", 5);
 	mNextDivisorLabel->setPosition(mTopBar->getContentSize().width * 0.68f, mTopBar->getContentSize().height/2);
 	mNextDivisorLabel->setVisible(false);
 	mTopBar->addChild(mNextDivisorLabel);
@@ -652,16 +722,17 @@ bool GameMode2InfiniteScene::init()
 	mCurrentDivisor = -1;
 	mNextDivisor = -1;
 	
-	cocos2d::Label* waveTitle = cocos2d::Label::createWithTTF("WAVE", "fonts/default.otf", 5);
+	cocos2d::Label* waveTitle = cocos2d::Label::createWithTTF("WAVE", "fonts/semibold.otf", 5);
 	waveTitle->setPosition(cocos2d::Vec2(12, mUILayer->getContentSize().height - 1));
 	waveTitle->setAnchorPoint(cocos2d::Vec2(0.5f, 1));
 	mUILayer->addChild(waveTitle);
 	
-	mWaveLabel = cocos2d::Label::createWithTTF("", "fonts/default.otf", 9);
+	mWaveLabel = cocos2d::Label::createWithTTF("", "fonts/semibold.otf", 9);
 	mWaveLabel->setPosition(cocos2d::Vec2(
 			waveTitle->getPosition().x - waveTitle->getContentSize().width * waveTitle->getAnchorPoint().x + waveTitle->getContentSize().width * 0.5f,
 			waveTitle->getPosition().y - waveTitle->getContentSize().height * waveTitle->getAnchorPoint().y - 1.0f));
 	mWaveLabel->setAnchorPoint(cocos2d::Vec2(0.5f, 1));
+	mWaveLabel->enableShadow(cocos2d::Color4B::BLACK, cocos2d::Size(0.25f, -0.25f));
 	mUILayer->addChild(mWaveLabel);
 	
 	setDivisorRange();
@@ -698,8 +769,19 @@ void GameMode2InfiniteScene::endGame(int nr)
 		AppDelegate::pluginAnalytics->logEvent("finished_level", &params);
 	}
 	
-	if (mIsGameServicesAvailable)
-		AppDelegate::pluginGameServices->publishScore(LEADERBOARD_MODE_2_ID, mScore);
+	//TODO: preload highscores, and maybe save them in bg, or in other thread .. ?
+	int highscore = cocos2d::UserDefault::getInstance()->getIntegerForKey("highscore_mode_2", 0);
+	if (highscore < mScore)
+	{
+		cocos2d::UserDefault::getInstance()->setIntegerForKey("highscore_mode_2", mScore);
+		
+		if (mIsGameServicesAvailable)
+			AppDelegate::pluginGameServices->publishScore(LEADERBOARD_MODE_2_ID, mScore);
+	}
+	
+	int maxWave = cocos2d::UserDefault::getInstance()->getIntegerForKey("max_wave", 0);
+	if (maxWave < mWaveNumber)
+		cocos2d::UserDefault::getInstance()->setIntegerForKey("max_wave", mWaveNumber);
 }
 
 void GameMode2InfiniteScene::update(float dt)
@@ -796,7 +878,7 @@ void GameMode2InfiniteScene::startWave()
 
 void GameMode2InfiniteScene::endWave()
 {
-	//TODO: move end wave logic after all balls are gone (maybe)
+	//TODO: move end wave (inc mWaveNumber) logic after all balls are gone (maybe)
 	if (mWaveNumber == 0)
 		cocos2d::UserDefault::getInstance()->setBoolForKey("skip_tutorial", true);
 	
@@ -804,6 +886,8 @@ void GameMode2InfiniteScene::endWave()
 	{
 		if (mWaveNumber == 0)
 			AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_1_WAVE);
+		else if (mWaveNumber == 5)
+			AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_5_WAVES);
 		else if (mWaveNumber == 10)
 			AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_10_WAVES);
 		else if (mWaveNumber == 50)
@@ -888,6 +972,8 @@ void GameMode2InfiniteScene::divideBall(Ball* ball)
 
 void GameMode2InfiniteScene::missBall(Ball* ball, bool manual)
 {
+	GameScene::missBall(ball);
+	
 	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("die.wav");
 	
 	endGame(ball->getNumber());
@@ -951,17 +1037,67 @@ bool GameMode2LevelScene::initWithLevelNumber(Level* level)
 	mBallSpeed = mLevel->getSpeed();
 	mSpawnInterval = (mLevelTimer-10) / mNumbersSize;
 	
-	cocos2d::Label* timeTitle = cocos2d::Label::createWithTTF("TIME", "fonts/default.otf", 5);
+	cocos2d::Label* timeTitle = cocos2d::Label::createWithTTF("TIME", "fonts/semibold.otf", 5);
 	timeTitle->setPosition(cocos2d::Vec2(12, mUILayer->getContentSize().height - 1));
 	timeTitle->setAnchorPoint(cocos2d::Vec2(0.5f, 1));
 	mUILayer->addChild(timeTitle);
 	
-	mTimerLabel = cocos2d::Label::createWithTTF("", "fonts/default.otf", 9);
+	mTimerLabel = cocos2d::Label::createWithTTF("", "fonts/semibold.otf", 9);
 	mTimerLabel->setPosition(cocos2d::Vec2(
 			timeTitle->getPosition().x - timeTitle->getContentSize().width * timeTitle->getAnchorPoint().x + timeTitle->getContentSize().width * 0.5f,
 			timeTitle->getPosition().y - timeTitle->getContentSize().height * timeTitle->getAnchorPoint().y - 1.0f));
 	mTimerLabel->setAnchorPoint(cocos2d::Vec2(0.5f, 1));
+	mTimerLabel->enableShadow(cocos2d::Color4B::BLACK, cocos2d::Size(0.25f, -0.25f));
 	mUILayer->addChild(mTimerLabel);
+	
+	cocos2d::Label* tutorial1 = cocos2d::Label::createWithTTF(
+			helpers::String::format("THE CURRENT DIVISOR IS\n%d", mLevel->getDivisor()),
+			"fonts/semibold.otf", 6, cocos2d::Size::ZERO, cocos2d::TextHAlignment::CENTER);
+	tutorial1->setLineSpacing(2.0f);
+	tutorial1->setScale(0.25f);
+	tutorial1->setOpacity(0);
+	tutorial1->setPosition(mUILayer->getContentSize().width * 0.5f, mUILayer->getContentSize().height * 0.55f);
+	tutorial1->setAnchorPoint(cocos2d::Vec2(0.5f, 0));
+	tutorial1->enableShadow(cocos2d::Color4B::BLACK, cocos2d::Size(0.25f, -0.25f));
+	mUILayer->addChild(tutorial1);
+	
+	tutorial1->runAction(cocos2d::Sequence::create(
+			cocos2d::FadeIn::create(0.5f),
+			cocos2d::DelayTime::create(4.0f),
+			cocos2d::FadeOut::create(0.5f),
+			cocos2d::DelayTime::create(0.5f),
+			cocos2d::RemoveSelf::create(),
+			nullptr));
+	
+	tutorial1->runAction(cocos2d::Sequence::create(
+			cocos2d::ScaleTo::create(0.5f, 1.0f),
+			cocos2d::DelayTime::create(4.0f),
+			cocos2d::ScaleTo::create(0.5f, 2.5f),
+			nullptr));
+	
+	cocos2d::Label* tutorial2 = cocos2d::Label::createWithTTF("TAP THE NUMBERS DIVISIBLE BY IT", "fonts/semibold.otf", 5);
+	tutorial2->setScale(0.25f);
+	tutorial2->setOpacity(0);
+	tutorial2->setPosition(mUILayer->getContentSize().width * 0.5f, mUILayer->getContentSize().height * 0.50f);
+	tutorial2->setAnchorPoint(cocos2d::Vec2(0.5f, 1));
+	tutorial2->enableShadow(cocos2d::Color4B::BLACK, cocos2d::Size(0.25f, -0.25f));
+	mUILayer->addChild(tutorial2);
+	
+	tutorial2->runAction(cocos2d::Sequence::create(
+			cocos2d::DelayTime::create(1.5f),
+			cocos2d::FadeIn::create(0.5f),
+			cocos2d::DelayTime::create(2.6f),
+			cocos2d::FadeOut::create(0.5f),
+			cocos2d::DelayTime::create(0.5f),
+			cocos2d::RemoveSelf::create(),
+			nullptr));
+	
+	tutorial2->runAction(cocos2d::Sequence::create(
+			cocos2d::DelayTime::create(1.5f),
+			cocos2d::ScaleTo::create(0.5f, 1.0f),
+			cocos2d::DelayTime::create(2.6f),
+			cocos2d::ScaleTo::create(0.5f, 2.5f),
+			nullptr));
 	
 	updateDivisor(mCurrentDivisor);
 	
@@ -979,7 +1115,7 @@ bool GameMode2LevelScene::initWithLevelNumber(Level* level)
 void GameMode2LevelScene::endGame(int nr)
 {
 	GameMode2Scene::endGame(nr);
-	//TODO fix this mScore
+	
 	if (nr)
 	{
 		DieOverlay* overlay = DieOverlay::create(nr);
@@ -989,16 +1125,19 @@ void GameMode2LevelScene::endGame(int nr)
 	}
 	else
 	{
-		int stars = mScore >= mLevel->getNrDivisible() * 0.5f
-				? (mScore >= mLevel->getNrDivisible() * 0.75f
-						? (mScore >= mLevel->getNrDivisible() ? 3 : 2)
-						: 1
-				  )
-				: 0;
-		
-		FinishOverlay* overlay = FinishOverlay::create(mScore, mLevel->getId() % 100, stars);
+		FinishOverlay* overlay = FinishOverlay::create(mScore, mLevel->getId() % 100, mLevel->getStars());
 		overlay->restartCallback = CC_CALLBACK_0(GameScene::restartGame, this);
-		overlay->nextLevelCallback = CC_CALLBACK_0(GameScene::exitGame, this); //TODO: fix functionality
+		overlay->nextLevelCallback = [this] () {
+			int nr = mLevel->getId() % 100;
+			
+			if (nr < LevelSelectScene::LEVEL_NR)
+			{
+				Level* level = &LevelSelectScene::LEVELS[nr];
+				cocos2d::Director::getInstance()->replaceScene(GameMode2LevelScene::create(level));
+			}
+			else
+				exitGame();
+		};
 		overlay->exitCallback = CC_CALLBACK_0(GameScene::exitGame, this);
 		addChild(overlay, 1000);
 	}
@@ -1020,6 +1159,20 @@ void GameMode2LevelScene::endGame(int nr)
 			params.insert(cocos2d::plugin::LogEventParamPair("category", "finished"));
 		
 		AppDelegate::pluginAnalytics->logEvent("finished_level", &params);
+	}
+	
+	if (mIsGameServicesAvailable && !nr)
+	{
+		if (mLevel == &LevelSelectScene::LEVELS[0])
+			AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_FIRST_LEVEL);
+		else if (mLevel == &LevelSelectScene::LEVELS[LevelSelectScene::LEVEL_NR-1])
+			AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_ALL_LEVELS);
+		
+		if (mLevel->getStars() == 3)
+			AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_FIRST_3_STARS);
+		
+		if (Level::getGlobalStars() >= LevelSelectScene::LEVEL_NR * 3)
+			AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_ALL_3_STARS);
 	}
 }
 
@@ -1048,18 +1201,6 @@ void GameMode2LevelScene::update(float dt)
 		mLevel->setScore(mScore);
 		
 		endGame(false);
-		
-		if (mIsGameServicesAvailable)
-		{
-			if (mLevel == &LevelSelectScene::LEVELS[0])
-				AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_FIRST_LEVEL);
-			else if (mLevel == &LevelSelectScene::LEVELS[11])
-				AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_ALL_LEVELS);
-			
-			if (mScore == mLevel->getNrDivisible())
-				AppDelegate::pluginGameServices->unlockAchievement(ACHIEVEMENT_FIRST_3_STARS);
-			//TODO: 3 stars for all levels ach
-		}
 	}
 }
 
@@ -1079,6 +1220,8 @@ void GameMode2LevelScene::divideBall(Ball* ball)
 
 void GameMode2LevelScene::missBall(Ball* ball, bool manual)
 {
+	GameScene::missBall(ball);
+	
 	if (manual)
 	{
 		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("die.wav");

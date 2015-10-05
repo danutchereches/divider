@@ -69,7 +69,7 @@ void IntroScene::load(float dt)
 	menu->setTag(200);
 	this->addChild(menu, 2);
 	
-	auto mode1Btn = cocos2d::MenuItemLabel::create(cocos2d::Label::createWithTTF("?", "fonts/default.otf", 6),
+	auto mode1Btn = cocos2d::MenuItemLabel::create(cocos2d::Label::createWithTTF("?", "fonts/semibold.otf", 6),
 			[] (cocos2d::Ref* btn) {
 		cocos2d::Director::getInstance()->pushScene(GameMode1Scene::create());
 	});
@@ -77,7 +77,7 @@ void IntroScene::load(float dt)
 	mode1Btn->setPosition(2, mVisibleSize.height - 2);
 	menu->addChild(mode1Btn);
 	
-	auto mode2Btn = cocos2d::MenuItemLabel::create(cocos2d::Label::createWithTTF("?", "fonts/default.otf", 6),
+	auto mode2Btn = cocos2d::MenuItemLabel::create(cocos2d::Label::createWithTTF("?", "fonts/semibold.otf", 6),
 			[] (cocos2d::Ref* btn) {
 		cocos2d::Director::getInstance()->pushScene(GameMode2InfiniteScene::create());
 	});
@@ -180,7 +180,60 @@ void IntroScene::update(float dt)
 				? (cocos2d::ActionInterval*) cocos2d::Sequence::create(cocos2d::Show::create(), cocos2d::FadeIn::create(0.25f), nullptr)
 				: (cocos2d::ActionInterval*) cocos2d::Sequence::create(cocos2d::FadeOut::create(0.25f), cocos2d::Hide::create(), nullptr));
 		
-		//TODO: submit achievements/update leaderboards
+		cocos2d::UserDefault* ud = cocos2d::UserDefault::getInstance();
+		
+		int stars = Level::getGlobalStars();
+		if (stars > 0)
+		{
+			AppDelegate::pluginGameServices->unlockAchievement(GameScene::ACHIEVEMENT_FIRST_LEVEL);
+			if (LevelSelectScene::LEVELS[LevelSelectScene::LEVEL_NR-1].getStars() > 0)
+				AppDelegate::pluginGameServices->unlockAchievement(GameScene::ACHIEVEMENT_ALL_LEVELS);
+			
+			int fullStars = 0;
+			for (int i = 0; i < LevelSelectScene::LEVEL_NR; i++)
+				if (LevelSelectScene::LEVELS[i].getStars() >= 3)
+					fullStars++;
+			
+			if (fullStars >= LevelSelectScene::LEVEL_NR)
+				AppDelegate::pluginGameServices->unlockAchievement(GameScene::ACHIEVEMENT_ALL_3_STARS);
+			else if (fullStars >= 1)
+				AppDelegate::pluginGameServices->unlockAchievement(GameScene::ACHIEVEMENT_FIRST_3_STARS);
+		}
+		
+		int highscore1 = ud->getIntegerForKey("highscore_mode_1", 0);
+		if (highscore1 > 0)
+			AppDelegate::pluginGameServices->publishScore(GameScene::LEADERBOARD_MODE_1_ID, highscore1);
+		
+		int highscore2 = ud->getIntegerForKey("highscore_mode_2", 0);
+		if (highscore2 > 0)
+		{
+			AppDelegate::pluginGameServices->publishScore(GameScene::LEADERBOARD_MODE_2_ID, highscore2);
+			AppDelegate::pluginGameServices->unlockAchievement(GameScene::ACHIEVEMENT_PLAY_GAME_2);
+		}
+		int maxWave = ud->getIntegerForKey("max_wave", 0);
+		if (maxWave >= 1)
+			AppDelegate::pluginGameServices->unlockAchievement(GameScene::ACHIEVEMENT_1_WAVE);
+		if (maxWave >= 5)
+			AppDelegate::pluginGameServices->unlockAchievement(GameScene::ACHIEVEMENT_5_WAVES);
+		if (maxWave >= 10)
+			AppDelegate::pluginGameServices->unlockAchievement(GameScene::ACHIEVEMENT_10_WAVES);
+		if (maxWave >= 50)
+			AppDelegate::pluginGameServices->unlockAchievement(GameScene::ACHIEVEMENT_50_WAVES);
+		
+		int globalScore = ud->getIntegerForKey("global_score", 0);
+		if (globalScore >= 1)
+		{
+			AppDelegate::pluginGameServices->publishScore(GameScene::LEADERBOARD_GLOBAL_DIVIDED_ID, globalScore);
+			AppDelegate::pluginGameServices->unlockAchievement(GameScene::ACHIEVEMENT_DIVIDE_1_NR);
+		}
+		if (globalScore >= 25)
+			AppDelegate::pluginGameServices->unlockAchievement(GameScene::ACHIEVEMENT_DIVIDE_25_NR);
+		if (globalScore >= 100)
+			AppDelegate::pluginGameServices->unlockAchievement(GameScene::ACHIEVEMENT_DIVIDE_100_NR);
+		if (globalScore >= 250)
+			AppDelegate::pluginGameServices->unlockAchievement(GameScene::ACHIEVEMENT_DIVIDE_250_NR);
+		if (globalScore >= 1000)
+			AppDelegate::pluginGameServices->unlockAchievement(GameScene::ACHIEVEMENT_DIVIDE_1000_NR);
 	}
 }
 
