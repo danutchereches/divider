@@ -68,7 +68,7 @@ void IntroScene::load(float dt)
 	menu->setContentSize(cocos2d::Size(mVisibleSize.width, mVisibleSize.height));
 	menu->setTag(200);
 	this->addChild(menu, 2);
-	
+	/*
 	auto mode1Btn = cocos2d::MenuItemLabel::create(cocos2d::Label::createWithTTF("?", "fonts/semibold.otf", 6),
 			[] (cocos2d::Ref* btn) {
 		cocos2d::Director::getInstance()->pushScene(GameMode1Scene::create());
@@ -76,7 +76,7 @@ void IntroScene::load(float dt)
 	mode1Btn->setAnchorPoint(cocos2d::Vec2(0, 1));
 	mode1Btn->setPosition(2, mVisibleSize.height - 2);
 	menu->addChild(mode1Btn);
-	
+	*/
 	auto mode2Btn = cocos2d::MenuItemLabel::create(cocos2d::Label::createWithTTF("?", "fonts/semibold.otf", 6),
 			[] (cocos2d::Ref* btn) {
 		cocos2d::Director::getInstance()->pushScene(GameMode2InfiniteScene::create());
