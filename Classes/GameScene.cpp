@@ -1067,7 +1067,17 @@ void GameMode2LevelScene::endGame(int nr)
 	{
 		FinishOverlay* overlay = FinishOverlay::create(mScore, mLevel->getId() % 100, mLevel->getStars());
 		overlay->restartCallback = CC_CALLBACK_0(GameScene::restartGame, this);
-		overlay->nextLevelCallback = CC_CALLBACK_0(GameScene::exitGame, this); //TODO: fix functionality
+		overlay->nextLevelCallback = [this] () {
+			int nr = mLevel->getId() % 100;
+			
+			if (nr < LevelSelectScene::LEVEL_NR)
+			{
+				Level* level = &LevelSelectScene::LEVELS[nr];
+				cocos2d::Director::getInstance()->replaceScene(GameMode2LevelScene::create(level));
+			}
+			else
+				exitGame();
+		};
 		overlay->exitCallback = CC_CALLBACK_0(GameScene::exitGame, this);
 		addChild(overlay, 1000);
 	}
