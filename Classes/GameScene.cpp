@@ -1046,6 +1046,53 @@ bool GameMode2LevelScene::initWithLevelNumber(Level* level)
 	mTimerLabel->setAnchorPoint(cocos2d::Vec2(0.5f, 1));
 	mUILayer->addChild(mTimerLabel);
 	
+	cocos2d::Label* tutorial1 = cocos2d::Label::createWithTTF(
+			helpers::String::format("THE CURRENT DIVISOR IS\n%d", mLevel->getDivisor()),
+			"fonts/semibold.otf", 6, cocos2d::Size::ZERO, cocos2d::TextHAlignment::CENTER);
+	tutorial1->setLineSpacing(2.0f);
+	tutorial1->setScale(0.25f);
+	tutorial1->setOpacity(0);
+	tutorial1->setPosition(mUILayer->getContentSize().width * 0.5f, mUILayer->getContentSize().height * 0.55f);
+	tutorial1->setAnchorPoint(cocos2d::Vec2(0.5f, 0));
+	mUILayer->addChild(tutorial1);
+	
+	tutorial1->runAction(cocos2d::Sequence::create(
+			cocos2d::FadeIn::create(0.5f),
+			cocos2d::DelayTime::create(4.0f),
+			cocos2d::FadeOut::create(0.5f),
+			cocos2d::DelayTime::create(0.5f),
+			cocos2d::RemoveSelf::create(),
+			nullptr));
+	
+	tutorial1->runAction(cocos2d::Sequence::create(
+			cocos2d::ScaleTo::create(0.5f, 1.0f),
+			cocos2d::DelayTime::create(4.0f),
+			cocos2d::ScaleTo::create(0.5f, 2.5f),
+			nullptr));
+	
+	cocos2d::Label* tutorial2 = cocos2d::Label::createWithTTF("TAP THE NUMBERS DIVISIBLE BY IT", "fonts/semibold.otf", 5);
+	tutorial2->setScale(0.25f);
+	tutorial2->setOpacity(0);
+	tutorial2->setPosition(mUILayer->getContentSize().width * 0.5f, mUILayer->getContentSize().height * 0.50f);
+	tutorial2->setAnchorPoint(cocos2d::Vec2(0.5f, 1));
+	mUILayer->addChild(tutorial2);
+	
+	tutorial2->runAction(cocos2d::Sequence::create(
+			cocos2d::DelayTime::create(1.5f),
+			cocos2d::FadeIn::create(0.5f),
+			cocos2d::DelayTime::create(2.6f),
+			cocos2d::FadeOut::create(0.5f),
+			cocos2d::DelayTime::create(0.5f),
+			cocos2d::RemoveSelf::create(),
+			nullptr));
+	
+	tutorial2->runAction(cocos2d::Sequence::create(
+			cocos2d::DelayTime::create(1.5f),
+			cocos2d::ScaleTo::create(0.5f, 1.0f),
+			cocos2d::DelayTime::create(2.6f),
+			cocos2d::ScaleTo::create(0.5f, 2.5f),
+			nullptr));
+	
 	updateDivisor(mCurrentDivisor);
 	
 	if (AppDelegate::pluginAnalytics != nullptr)
