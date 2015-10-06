@@ -124,7 +124,7 @@ void IntroScene::load(float dt)
 	auto leaderboardsBtn = cocos2d::MenuItemSprite::create(cocos2d::Sprite::createWithSpriteFrameName("leaderboards_btn"),
 			nullptr, [] (cocos2d::Ref* btn) {
 		if (AppDelegate::pluginGameServices && AppDelegate::pluginGameServices->isSignedIn())
-			AppDelegate::pluginGameServices->showLeaderboards();
+			AppDelegate::pluginGameServices->showLeaderboard(GameScene::LEADERBOARD_GLOBAL_DIVIDED_ID);
 	});
 	leaderboardsBtn->setPosition(mVisibleSize.width * 0.7f, mVisibleSize.height * 0.12f);
 	leaderboardsBtn->setTag(302);
