@@ -584,13 +584,13 @@ void GameMode1Scene::divideBall(Ball* ball)
 
 void GameMode1Scene::missBall(Ball* ball)
 {
-	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("die.wav");
+	//CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("die.wav");
 	ball->setScale(ball->getScale() + 0.1f);
 }
 
 void GameMode1Scene::ballPopCallback(Ball* ball)
 {
-	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("die.wav");
+	//CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("die.wav");
 	
 	endGame(ball->getNumber());
 }
@@ -974,7 +974,7 @@ void GameMode2InfiniteScene::missBall(Ball* ball, bool manual)
 {
 	GameScene::missBall(ball);
 	
-	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("die.wav");
+	//CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("die.wav");
 	
 	endGame(ball->getNumber());
 }
@@ -1224,7 +1224,7 @@ void GameMode2LevelScene::missBall(Ball* ball, bool manual)
 	
 	if (manual)
 	{
-		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("die.wav");
+		//CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("die.wav");
 		
 		endGame(ball->getNumber());
 	}

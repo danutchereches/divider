@@ -283,6 +283,7 @@ bool FinishOverlay::init(int score, int level, int stars)
 	addChild(levelBg);
 	
 	cocos2d::Label* levelLabel = cocos2d::Label::createWithTTF(helpers::String::format("%d", level), "fonts/semibold.otf", 14);
+	levelLabel->enableShadow(cocos2d::Color4B::BLACK, cocos2d::Size(0.25f, -0.25f));
 	levelLabel->setPosition(getContentSize().width * 0.5f, getContentSize().height * 0.7f);
 	addChild(levelLabel);
 	
